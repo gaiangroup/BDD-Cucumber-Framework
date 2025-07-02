@@ -1,0 +1,67 @@
+{
+"tabs": [
+        
+        {
+            "name": "My Organization"
+        },
+        {
+            "name": "Roles & Privileges"
+        }
+    ],
+        "roleForm_stepper1": {
+        "buttonText": "Next",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "fields": {
+            "Name *": {
+                "value": "AutomationRole"
+            },
+            "Role Type *": {
+                "value": [
+                    "Engineer"
+                ]
+            },
+            "Description *": {
+                "value": "This is a test role for automation"
+            }
+        }
+    },
+    "roleForm_stepper2": {
+        "buttonText": "Next",
+        "matchIndex": 2,
+        "requiredError": "Please provide customroles",
+        "fields": {
+            "Custom Roles *": {
+                "value": [
+                    "Policies_Write",
+                    "Project_Write",
+                    "Project_Read"
+                ]
+            }
+        }
+    },
+    "roleForm_stepper3": {
+        "buttonText": "Save",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "expectedToast": "Role Created Successfully",
+        "fields": {
+            "Currency *": {
+                "value": [
+                    "INDIA"
+                ]
+            },
+            "Budget *": {
+                "value": "10000"
+            }
+        }
+    },
+    "button": [
+        {
+            "label": "Add Infrastructure"
+        },
+        {
+            "label": "New Role"
+        }
+    ]
+    }

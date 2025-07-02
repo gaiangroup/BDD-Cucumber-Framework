@@ -1,0 +1,145 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "my-organization-validations;role-creation",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "Role Creation",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 597156935
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 646646465
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3596022853
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:23"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1988768118
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 7,
+            "name": "User switch to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 4130753
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 8,
+            "name": "User click on Role tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3312315
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 9,
+            "name": "User click on New Role button",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:28"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 38938933
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 10,
+            "name": "User should see role creation form and fill in the details",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:32"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 5002012383,
+              "error_message": "Error: function timed out, ensure the promise resolves within 5000 milliseconds\n    at Timeout.<anonymous> (/home/gaian/Desktop/Cucumber_BDD_PWFramework/node_modules/@cucumber/cucumber/lib/time.js:64:20)\n    at listOnTimeout (node:internal/timers:594:17)\n    at process.processTimers (node:internal/timers:529:7)"
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 236306785
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 115533266
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@org_validations",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "my-organization-validations",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "My Organization validations",
+    "tags": [
+      {
+        "name": "@org_validations",
+        "line": 1
+      }
+    ],
+    "uri": "features/MyOrg.feature"
+  }
+]

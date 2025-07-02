@@ -1,0 +1,29 @@
+{
+    "login_form": {
+        "buttonText": "Login",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "expectedToast": "Logged in successfully!",
+        "fields": {
+            "Email *": {
+                "value": "aidtaas@gaiansolutions.com"
+            },
+            "Password *": {
+                "value": "Gaian@123"
+            }
+        }
+    },
+    "login_Invalidcred": {
+        "buttonText": "Login",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "fields": {
+            "Email *": {
+                "value": "abc@gmail.com"
+            },
+            "Password *": {
+                "value": "01234@gaian"
+            }
+        }
+    }
+}
