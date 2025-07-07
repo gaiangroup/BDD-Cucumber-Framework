@@ -1,14 +1,19 @@
 {
-"tabs": [
-        
+    "tabs": [
         {
             "name": "My Organization"
         },
         {
             "name": "Roles & Privileges"
+        },
+        {
+            "name": "Teams"
+        },
+        {
+            "name": "Users"
         }
     ],
-        "roleForm_stepper1": {
+    "roleForm_stepper1": {
         "buttonText": "Next",
         "matchIndex": 1,
         "requiredError": "Please fill out all mandatory fields.",
@@ -17,6 +22,7 @@
                 "value": "AutomationRole"
             },
             "Role Type *": {
+                "type": "dropdown",
                 "value": [
                     "Engineer"
                 ]
@@ -29,11 +35,11 @@
     "roleForm_stepper2": {
         "buttonText": "Next",
         "matchIndex": 2,
-        "requiredError": "Please provide customroles",
         "fields": {
             "Custom Roles *": {
+                "type": "dropdown",
+                "scrollIntoView": true,
                 "value": [
-                    "Policies_Write",
                     "Project_Write",
                     "Project_Read"
                 ]
@@ -47,6 +53,7 @@
         "expectedToast": "Role Created Successfully",
         "fields": {
             "Currency *": {
+                "type": "dropdown",
                 "value": [
                     "INDIA"
                 ]
@@ -62,6 +69,56 @@
         },
         {
             "label": "New Role"
+        },
+        {
+            "label": "Add Team"
+        },
+        {
+            "label": "Invite Users"
         }
-    ]
-    }
+    ],
+    "keyboardAction": [
+        {
+            "key": "Tab",
+            "repeat": 3,
+            "wait": 300
+        }
+    ],
+    "teamCreation_form": {
+        "buttonText": "Save",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "expectedToast": "Team is created successfully!",
+        "fields": {
+            "Team *": {
+                "value": "Test Automation"
+            },
+            "Describe what the team does *": {
+                "value": "This team is responsible for automation testing"
+            },
+            "Tags *": {
+                "type": "tag",
+                "value": [
+                    "test1",
+                    "qa"
+                ]
+            },
+            "Members *": {
+                "type": "dropdown",
+                "value": [
+                    "Abhijeet Tehra",
+                    "Abhishek T"
+                ]
+            }
+        }
+    },
+    "emails": [
+        "testjune20@mailinator.com"
+    ],
+    "labels": {
+    "emailInput": "Enter mails here to invite people",
+    "sendButton": "Send Invites",
+    "successModal": "Your team invitations are on the way!"
+  },
+    "subject": "Youve been invited to join RunRun as a Tenant User"
+}

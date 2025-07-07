@@ -1,27 +1,28 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 // *************** CONFIGURATION *****************
 
-// 1️.Default tag to run
-const defaultTag = '@org_validations';
-
-// 2️.Default features folder
+const defaultTag = '@userInvitation';
 const defaultFeatureDir = 'features';
+const reportJsonPath = path.join(__dirname, '..', 'reports', 'cucumber_report.json');
 
-// 3️.Additional Cucumber options
+
 const defaultOptions = [
   '--require', 'step_definitions/**/*.js',
-  '--format', 'progress',
-  '--format', 'json:./reports/cucumber_report.json'
+  '--format', `json:${reportJsonPath}`,
+  '--format', 'progress'
 ];
 
-// *************** GET ARGUMENTS *****************
+// *************** CLEAN PREVIOUS REPORT *****************
 
-// Example usage:
-// node runner.js @regression
-// node runner.js @smoke features/login.feature
-// node runner.js
+if (fs.existsSync(reportJsonPath)) {
+  console.log('Cleaning up previous cucumber_report.json...');
+  fs.unlinkSync(reportJsonPath);
+}
+
+// *************** GET ARGUMENTS *****************
 
 const args = process.argv.slice(2);
 
@@ -31,9 +32,9 @@ let featureArg = args[1] || defaultFeatureDir;
 // *************** SPAWN CUCUMBER *****************
 
 const cucumberArgs = [
-    featureArg,
-    '--tags', tagArg,
-    ...defaultOptions
+  featureArg,
+  '--tags', tagArg,
+  ...defaultOptions
 ];
 
 console.log(`Running Cucumber with:
@@ -44,6 +45,6 @@ console.log(`Running Cucumber with:
 const cucumber = spawn('npx', ['cucumber-js', ...cucumberArgs], { stdio: 'inherit' });
 
 cucumber.on('close', (code) => {
-    console.log(`Cucumber finished with exit code ${code}`);
-    process.exit(code);
+  console.log(`Cucumber finished with exit code ${code}`);
+  process.exit(code);
 });
