@@ -1,0 +1,12 @@
+{
+  "DashboardMenu": {
+    "targetText": "Dashboard",
+    "expectedText": "Dashboard",
+    "label": "Dashboard Menu"
+  },
+  "userIcon": {
+    "targetText": "Profile",
+    "expectedText": "User settings",
+    "label": "Profile Icon"
+  }
+}

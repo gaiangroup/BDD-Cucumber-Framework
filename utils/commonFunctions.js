@@ -571,3 +571,65 @@ export async function sendAndValidateInvites(page, config) {
   }
 }
 
+//********************Generic tooltip hover and validator*****************/
+// utils/verifyTooltip.js
+
+export async function verifyTooltip(page, config) {
+  const xpath = `(//*[text()="${config.targetText}"])[1]`;
+  const hoverTarget = page.locator(`xpath=${xpath}`);
+
+  console.log(`⏳ Waiting for target to be visible: ${config.targetText}`);
+  await hoverTarget.waitFor({ state: "visible", timeout: 10000 });
+
+  console.log(`👁️ Scrolling into view...`);
+  await hoverTarget.scrollIntoViewIfNeeded();
+
+  console.log(`🖱️ Hovering on: ${config.label}`);
+  await hoverTarget.hover({ force: true });
+
+  // ✅ Use CSS selector syntax instead of invalid XPath
+  const tooltipSelector = config.tooltipSelector || `mobius-router[title*="${config.targetText}"]`;
+  const tooltipLocator = page.locator(tooltipSelector);
+
+  console.log(`⏳ Waiting for tooltip to appear...`);
+  await tooltipLocator.waitFor({ state: "visible", timeout: 5000 });
+
+  const actualTooltipText = (await tooltipLocator.textContent())?.trim();
+  console.log(`🔍 Tooltip text: ${actualTooltipText}`);
+
+  if (actualTooltipText !== config.expectedText) {
+    throw new Error(`❌ Tooltip mismatch. Expected: "${config.expectedText}", Got: "${actualTooltipText}"`);
+  }
+
+  console.log(`✅ Tooltip validation passed`);
+}
+
+//********************Generic expand and Collapse validator*****************/
+// utils/expandCollapseUtils.js
+
+export async function expandSection(page, sectionLabel) {
+  const sectionToggle = page.locator(`text=${sectionLabel} >> xpath=../..//button[contains(@aria-label, "Expand")]`);
+  if (await sectionToggle.isVisible()) {
+    console.log(`⏩ Expanding "${sectionLabel}"...`);
+    await sectionToggle.click();
+  } else {
+    console.log(`✅ "${sectionLabel}" already expanded or no expand control found.`);
+  }
+}
+
+export async function collapseSection(page, sectionLabel) {
+  const sectionToggle = page.locator(`text=${sectionLabel} >> xpath=../..//button[contains(@aria-label, "Collapse")]`);
+  if (await sectionToggle.isVisible()) {
+    console.log(`⏬ Collapsing "${sectionLabel}"...`);
+    await sectionToggle.click();
+  } else {
+    console.log(`✅ "${sectionLabel}" already collapsed or no collapse control found.`);
+  }
+}
+
+export async function isSectionExpanded(page, sectionLabel) {
+  const expandedSection = page.locator(`text=${sectionLabel} >> xpath=../..`);
+  const ariaExpanded = await expandedSection.getAttribute('aria-expanded');
+  return ariaExpanded === 'true';
+}
+

@@ -1,0 +1,105 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "tooltip-on-hover;user-sees-correct-tooltip-text-when-hovering-over-dashboard-menu",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "User sees correct tooltip text when hovering over Dashboard menu",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 484253000
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 684970499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions\\login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3213013099
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions\\login.steps.js:23"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 4941232400
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 7,
+            "name": "Tooltip should be validated for \"DashboardMenu\"",
+            "match": {
+              "location": "step_definitions\\tooltip.steps.js:7"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 93945999
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 1160540100
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 545475800
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@tooltip",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "tooltip-on-hover",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Tooltip on Hover",
+    "tags": [
+      {
+        "name": "@tooltip",
+        "line": 1
+      }
+    ],
+    "uri": "features\\tooltip.feature"
+  }
+]

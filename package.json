@@ -3,24 +3,35 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node runner.js"
+    "clean": "rimraf reports/*",
+    "test": "npx cucumber-js features/tooltip.feature --format json:reports/tooltip-report.json",
+    "report": "node generate-report.js reports/tooltip-report.json reports/html/tooltip"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@cucumber/cucumber": "^11.3.0",
+    "@playwright/test": "^1.53.2",
     "allure-commandline": "^2.34.1",
     "chai": "^5.2.0",
-    "cucumber-html-reporter": "^7.2.0",
     "dotenv": "^17.0.1",
     "inline-source": "^8.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3",
-    "playwright": "^1.53.1"
+    "playwright": "^1.53.1",
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
-    "imap": "^0.8.19",
+    "imap": "^0.8.17",
     "mailparser": "^3.7.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sushma-99957/BDD-Cucumber-Framework.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sushma-99957/BDD-Cucumber-Framework/issues"
+  },
+  "homepage": "https://github.com/Sushma-99957/BDD-Cucumber-Framework#readme",
+  "description": ""
 }
