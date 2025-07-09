@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions,sendAndValidateInvites,validateTableHeadersByColumnNames } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions,sendAndValidateInvites } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const fs = require('fs');
 const path = require('path');
@@ -92,19 +92,37 @@ Then('User should send the invitation and validate the subject',{ timeout: 60 * 
     console.log(result);
 });
 
+// Then(
+//   'User clicks on {string} tab and verifies the following table headers:',
+//   { timeout: 50000 },
+//   async function (tabName, dataTable) {
+//     const tabIndexMap = {
+//     // 'Roles & Privileges': 1,
+//      //'Teams': 2,
+//       'Users': 3,  
+//     };
+
+//     const tabIndex = tabIndexMap[tabName];
+//     if (tabIndex === undefined) {
+//       throw new Error(`Tab "${tabName}" is not mapped. Please update tabIndexMap.`);
+//     }
+
+//     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
+
+//     const columnNames = dataTable.raw().flat();
+//     await validateTableHeadersByColumnNames(this.page, columnNames);
+//   }
+// );
+
+
 Then(
   'User clicks on {string} tab and verifies the following table headers:',
   { timeout: 50000 },
   async function (tabName, dataTable) {
-    const tabIndexMap = {
-     'Roles & Privileges': 1,
-     'Teams': 2,
-      'Users': 3,  
-    };
+    const tabIndex = myOrg_json.tabs.findIndex(tab => tab.label === tabName || tab.name === tabName);
 
-    const tabIndex = tabIndexMap[tabName];
-    if (tabIndex === undefined) {
-      throw new Error(`Tab "${tabName}" is not mapped. Please update tabIndexMap.`);
+    if (tabIndex === -1) {
+      throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
     }
 
     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);

@@ -455,9 +455,9 @@ export async function clickButton(page, buttonConfig) {
 
 //*************************Wait Until Page is Ready************************
 export async function waitUntilPageIsReady(page) {
-  await page.waitForLoadState('networkidle');
-  await page.waitForLoadState('load');        // Waits for the full load event
-  await page.waitForLoadState('domcontentloaded'); // Waits until the DOM is parsed
+  await page.waitForLoadState('networkidle',{ timeout: 50000 });
+  await page.waitForLoadState('load',{ timeout: 50000 });       // Waits for the full load event
+  await page.waitForLoadState('domcontentloaded',{ timeout: 50000 }); // Waits until the DOM is parsed
 
 }
 
