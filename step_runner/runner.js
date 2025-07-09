@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // *************** CONFIGURATION *****************
 
-const defaultTag = '@userInvitation';
+const defaultTag = '@roles';
 const defaultFeatureDir = 'features';
 const reportJsonPath = path.join(__dirname, '..', 'reports', 'cucumber_report.json');
 

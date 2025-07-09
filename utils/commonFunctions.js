@@ -378,6 +378,51 @@ export async function switchToTabOrModule(page, config) {
   }
 }
 
+
+
+//***********************Generic Table Validation ****************************************************
+// export async function validateTableHeadersByColumnNames(page, expectedColumns) {
+//   for (const columnName of expectedColumns) {
+//     const xpath = `(//*[contains(text(),'${columnName}')])[1]`;
+//     console.log(`**************`+xpath)
+
+//     const columnLocator = page.locator(`xpath=${xpath}`);
+//     await expect(columnLocator).toBeVisible({
+//       timeout: 70000,
+//     });
+//     console.log(`✅ Visible: ${columnName}`);
+//   }
+// }
+
+
+/**
+ * Validates that each expected column name is visible using your custom XPath strategy.
+ *
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ * @param {string[]} expectedColumns - List of expected header names
+ */
+export async function validateTableHeadersByColumnNames(page, expectedColumns) {
+  for (const columnName of expectedColumns) {
+    const xpath = `(//*[contains(text(),'${columnName}')])[1]`;
+   // console.log(`************** ${xpath}`);
+
+    const columnLocator = page.locator(`xpath=${xpath}`);
+
+    try {
+      await columnLocator.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(columnLocator).toBeVisible({
+        timeout: 10000,
+      });
+      console.log(`✅ Visible: ${columnName}`);
+    } catch (error) {
+      console.error(`❌ Not visible: ${columnName} — Might be hidden or delayed in rendering.`);
+      throw error;
+    }
+  }
+}
+
+
+
 //************************Click Button Function************************
 export async function clickButton(page, buttonConfig) {
   const label = buttonConfig?.label;
@@ -410,9 +455,10 @@ export async function clickButton(page, buttonConfig) {
 
 //*************************Wait Until Page is Ready************************
 export async function waitUntilPageIsReady(page) {
+  await page.waitForLoadState('networkidle');
   await page.waitForLoadState('load');        // Waits for the full load event
   await page.waitForLoadState('domcontentloaded'); // Waits until the DOM is parsed
-  await page.waitForLoadState('networkidle');
+
 }
 
 //*************************Navigate and Enter using Keyboard************************
@@ -463,6 +509,20 @@ export async function sendAndValidateInvites(page, config) {
     await page.waitForTimeout(500);
     console.log(`✅ Entered email: ${email}`);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Step 2: Click send button
   const sendButtonLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.sendButton}")]//ancestor::button)[1]`);

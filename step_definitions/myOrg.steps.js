@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions,sendAndValidateInvites } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions,sendAndValidateInvites,validateTableHeadersByColumnNames } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const fs = require('fs');
 const path = require('path');
@@ -28,27 +28,27 @@ After(async function (scenario) {
     }
 });
 
-When('User switches to My Organization tab', async function () {
+Then('User switches to My Organization tab',{ timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[0]);
 });
 
-When('User clicks on Role tab', async function () {
+Then('User clicks on Role tab',{ timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[1]);
 });
 
-When('User allows location access', async function () {
+Then('User allows location access', async function () {
     await this.page.waitForTimeout(2000);
     await performKeyboardActions(this.page, myOrg_json.keyboardAction);
 });
 
-When('User clicks on New Role button', async function () {
+Then('User clicks on New Role button',{ timeout: 20000 }, async function () {
     await this.page.waitForTimeout(2000);
     await clickButton(this.page, myOrg_json.button[1]);
 });
 
-Then('User should see the role creation form and fill in the details',{ timeout: 60 * 1000 }, async function () {
+Then('User should see the role creation form and fill in the details',{ timeout: 20000 }, async function () {
     await handleGenericForm(this.page, myOrg_json.roleForm_stepper1);
     console.log("Stepper 1 form submitted. Waiting before filling Stepper 2...");
     await waitUntilPageIsReady(this.page); // Ensure page is ready before next step
@@ -60,12 +60,12 @@ Then('User should see the role creation form and fill in the details',{ timeout:
 });
 
 // ********************Team Creation Steps*****************************************
-When('User clicks on Teams tab', async function () {
+Then('User clicks on Teams tab',{ timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[2]);
 });
 
-When('User clicks on Add Team button',{ timeout: 60 * 1000 }, async function () {
+Then('User clicks on Add Team button',{ timeout: 60 * 1000 }, async function () {
     await this.page.waitForTimeout(2000);
     await clickButton(this.page, myOrg_json.button[2]);
 });
@@ -76,12 +76,12 @@ Then('User should see the Team creation form and fill in the details',{ timeout:
 });
 
 //*************** */
-When('User clicks on Users tab', async function () {
+Then('User clicks on Users tab', async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[3]);
 });
 
-When('User clicks on Invite Users button',{ timeout: 60 * 1000 }, async function () {
+Then('User clicks on Invite Users button',{ timeout: 60 * 1000 }, async function () {
     await waitUntilPageIsReady(this.page);
    await clickButton(this.page, myOrg_json.button[3]);
 });
@@ -91,3 +91,26 @@ Then('User should send the invitation and validate the subject',{ timeout: 60 * 
     const result =await sendAndValidateInvites(this.page, myOrg_json);
     console.log(result);
 });
+
+Then(
+  'User clicks on {string} tab and verifies the following table headers:',
+  { timeout: 50000 },
+  async function (tabName, dataTable) {
+    const tabIndexMap = {
+     'Roles & Privileges': 1,
+     'Teams': 2,
+      'Users': 3,  
+    };
+
+    const tabIndex = tabIndexMap[tabName];
+    if (tabIndex === undefined) {
+      throw new Error(`Tab "${tabName}" is not mapped. Please update tabIndexMap.`);
+    }
+
+    await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
+
+    const columnNames = dataTable.raw().flat();
+    await validateTableHeadersByColumnNames(this.page, columnNames);
+  }
+);
+

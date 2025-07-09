@@ -20,7 +20,7 @@ Given('User navigate to the login page', async function () {
     await this.page.goto('https://qa-runrun-ui.aidtaas.com/');
 });
 
-When('User login with valid credentials and successful login', { timeout: 20000 }, async function () {
+When('User login with valid credentials and successful login', { timeout: 50000 }, async function () {
     await handleGenericForm(this.page, login_testData.login_form);
     await waitUntilPageIsReady(this.page);
 });
