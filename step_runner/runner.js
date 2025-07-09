@@ -2,16 +2,15 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const defaultTag = '@tooltip';
+const defaultTag = '@expandCollapse';
+
 const defaultFeatureDir = 'features';
 const reportJsonPath = path.join(__dirname, '..', 'reports', 'cucumber_report.json');
 
 const defaultOptions = [
   '--require', 'step_definitions/**/*.js',
-  '--format', `json:${reportJsonPath}`,
+  '--format', `"json:${reportJsonPath.replace(/\\/g, '/')}"` ,
   '--format', 'progress'
-
-  
 ];
 
 if (fs.existsSync(reportJsonPath)) {
@@ -33,7 +32,6 @@ const cucumberArgs = [
   ...defaultOptions
 ];
 
-// ✅ Wrap npm path in quotes
 const npmCmdQuoted = `"C:\\Program Files\\nodejs\\npm.cmd"`;
 
 console.log(`🚀 Running Cucumber:

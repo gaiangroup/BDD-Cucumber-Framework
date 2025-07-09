@@ -1,179 +1,7 @@
-import { expect } from '@playwright/test';
-
-
+const { expect } = require('@playwright/test');
 
 // ************************Handle Custom Checkboxes************************
-// export async function handleGenericForm(page, formJson) {
-//   const fields = formJson.fields || {};
-//   const buttonText = formJson.buttonText;
-//   const expectedToast = formJson.expectedToast || null;
-//   const requiredError = formJson.requiredError || null;
-//   const matchIndex = formJson.matchIndex || 1;
-
-//   // 🔹 Step 1: Validate required error before filling
-//   if (requiredError) { 
-//     const submitBtn = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
-//     if (await submitBtn.isVisible()) {
-//       await expect(submitBtn).toBeEnabled();
-//       await submitBtn.click();
-//       console.log(`Clicked on action button (pre-submit): "${buttonText}"`);
-
-//       const errorLocator = page.locator(`text=${requiredError}`);
-//       try {
-//         await expect(errorLocator).toBeVisible({ timeout: 6000 });
-//         console.log(`Required validation message shown: "${requiredError}"`);
-//       } catch {
-//         console.warn(`Expected required error message not found.`);
-//       }
-//     }
-//   }
-
-//   // 🔹 Step 2: Fill form fields
-//   for (const [label, config] of Object.entries(fields)) {
-//     const { value } = config;
-
-//     // Handle Date Picker
-//     if (
-//       value && config.type === "dateselection" &&
-//       typeof value === 'object' &&
-//       'id' in value &&
-//       'day' in value &&
-//       'index' in value
-//     ) {
-
-//       const datePickerTrigger = page.locator(`(//*[text()='${label}']//following::mobius-date-picker)[1]`);
-//       // if (!(await datePickerTrigger.isVisible())) {
-//       //   console.warn(`Date picker with id "${value.id}" not found for "${label}"`);
-//       //   continue;
-//       // }
-
-//       await expect(datePickerTrigger).toBeVisible({ timeout: 7000 });
-//       await page.waitForTimeout(1000); // slight wait for date picker to be ready
-//       await datePickerTrigger.click({ force: true });
-//       const dateLocator = page.locator(`(//div[contains(text(),'${value.day}')])[${value.index}]`);
-//       await expect(dateLocator).toBeVisible({ timeout: 7000 });
-//       await dateLocator.click();
-//       console.log(`Picked date "${value.day}" for "${label}"`);
-//       continue;
-//     }
-
-//     // Handle Checkbox Array
-//     if (
-//       Array.isArray(value) &&
-//       value.every(v => typeof v === 'object' && 'text' in v && 'matchIndex' in v)
-//     ) {
-//       for (const valObj of value) {
-//         const val = valObj.text;
-//         const idx = valObj.matchIndex;
-//         const checkbox = page.locator(
-//           `xpath=(//*[contains(@*, 'checkbox')]//following::*[normalize-space(text())='${val}'])[${idx}]`
-//         );
-
-//         await expect(checkbox).toBeVisible({ timeout: 5000 });
-//         await checkbox.click();
-//         console.log(`Checked "${val}" under "${label}"`);
-//       }
-//       continue;
-//     }
-
-//     // Handle Tag Input (array of strings)
-//     if (
-//       Array.isArray(value) && config.type === "tag" &&
-//       value.every(v => typeof v === 'string')
-//     ) {
-//       const tagInput = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[3])[1]`);
-//       await expect(tagInput).toBeVisible();
-//       for (const val of value) {
-//         await tagInput.click();
-//         await page.keyboard.type(val);
-//         await page.keyboard.press('Enter');
-//         console.log(`Entered tag "${val}" for "${label}"`);
-//       }
-//       continue;
-//     }
-
-//     // Handle Dropdown (array of strings)
-//     // Handle Dropdown (array of strings with type dropdown)
-//     if (
-//       Array.isArray(value) &&
-//       config.type === "dropdown"
-//     ) {
-//       const dropdownTrigger = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-dropdown-input-container)[1]`);
-
-//       await expect(dropdownTrigger).toBeVisible({ timeout: 5000 });
-
-//       // Always click to open dropdown first
-//       await dropdownTrigger.click();
-//       await page.waitForTimeout(1000);
-
-//       for (const val of value) {
-//         // Use a more specific locator to match only options inside the dropdown list
-//         const optionLocator = page.locator(`xpath=(//mobius-list-item[text()='${val}'])[1]`);
-
-//         if (await optionLocator.count() === 0) {
-//           console.warn(`Option "${val}" not found for dropdown "${label}".`);
-//           continue;
-//         }
-
-//         await expect(optionLocator).toBeVisible({ timeout: 5000 });
-//         await optionLocator.scrollIntoViewIfNeeded();
-//         await optionLocator.click(); // force click to ensure it works even if hidden
-//         await page.waitForTimeout(300);
-//       }
-
-//       // Click label to close dropdown
-//       const labelClickLocator = page.locator(`xpath=(//*[contains(text(),'${label}')])[1]`);
-//       if (await labelClickLocator.count() > 0) {
-//         await labelClickLocator.click();
-//         await page.waitForTimeout(300);
-//         console.log(`Closed dropdown by clicking label "${label}".`);
-//       } else {
-//         console.warn(`Could not find label "${label}" to close dropdown.`);
-//       }
-
-//       console.log(`Selected value(s) for "${label}": ${value.join(', ')}`);
-//       continue;
-//     }
-
-
-
-
-//     // Handle Input Field
-//     const inputLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
-//     if (!(await inputLocator.isVisible())) {
-//       console.warn(`Input field "${label}" not found.`);
-//       continue;
-//     }
-//     await inputLocator.click();
-//     await page.keyboard.type(value.toString());
-
-//     // Masking sensitive values
-//     let maskedValue = value;
-//     if (label.toLowerCase().includes('password')) maskedValue = '****';
-//     if (typeof value === 'string' && value.includes('@')) {
-//       const [user, domain] = value.split('@');
-//       maskedValue = '*'.repeat(user.length) + '@' + domain;
-//     }
-
-//     console.log(`Filled "${label}" with "${maskedValue}"`);
-//   }
-
-//   // 🔹 Step 3: Submit form
-//   const actionButton = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
-//   await expect(actionButton).toBeVisible({ timeout: 7000 });
-//   await expect(actionButton).toBeEnabled();
-//   await actionButton.click();
-//   console.log(`Clicked action button: "${buttonText}"`);
-
-//   // 🔹 Step 4: Toast validation
-//   if (expectedToast) {
-//     const toastLocator = page.locator(`text=${expectedToast}`);
-//     await expect(toastLocator).toBeVisible({ timeout: 7000 });
-//     console.log(`Toast message shown: "${expectedToast}"`);
-//   }
-// }12:02
-
-export async function handleGenericForm(page, formJson) {
+async function handleGenericForm(page, formJson) {
   const fields = formJson.fields || {};
   const buttonText = formJson.buttonText;
   const expectedToast = formJson.expectedToast || null;
@@ -339,9 +167,8 @@ export async function handleGenericForm(page, formJson) {
   }
 }
 
-
 //************************Generic switchToTab()/Module Function************************
-export async function switchToTabOrModule(page, config) {
+async function switchToTabOrModule(page, config) {
   let tabArray = [];
 
   // Accept either: [{name: 'tab'}] or {name: 'tab'}
@@ -379,7 +206,7 @@ export async function switchToTabOrModule(page, config) {
 }
 
 //************************Click Button Function************************
-export async function clickButton(page, buttonConfig) {
+async function clickButton(page, buttonConfig) {
   const label = buttonConfig?.label;
 
   if (!label || typeof label !== 'string') {
@@ -409,14 +236,14 @@ export async function clickButton(page, buttonConfig) {
 }
 
 //*************************Wait Until Page is Ready************************
-export async function waitUntilPageIsReady(page) {
+async function waitUntilPageIsReady(page) {
   await page.waitForLoadState('load');        // Waits for the full load event
   await page.waitForLoadState('domcontentloaded'); // Waits until the DOM is parsed
   await page.waitForLoadState('networkidle');
 }
 
 //*************************Navigate and Enter using Keyboard************************
-export async function performKeyboardActions(page, actions = []) {
+async function performKeyboardActions(page, actions = []) {
   if (!Array.isArray(actions) || actions.length === 0) {
     console.warn('"keyboardAction" config is missing or invalid.');
     return;
@@ -443,7 +270,7 @@ export async function performKeyboardActions(page, actions = []) {
 
 //********************Generic invitation sender and email validator.*****************/
 // utils/sendAndValidateInvites.js
-export async function sendAndValidateInvites(page, config) {
+async function sendAndValidateInvites(page, config) {
   // Dynamically import ESM-compatible packages
   const dotenv = await import('dotenv');
   dotenv.config();
@@ -574,7 +401,7 @@ export async function sendAndValidateInvites(page, config) {
 //********************Generic tooltip hover and validator*****************/
 // utils/verifyTooltip.js
 
-export async function verifyTooltip(page, config) {
+async function verifyTooltip(page, config) {
   const xpath = `(//*[text()="${config.targetText}"])[1]`;
   const hoverTarget = page.locator(`xpath=${xpath}`);
 
@@ -607,29 +434,41 @@ export async function verifyTooltip(page, config) {
 //********************Generic expand and Collapse validator*****************/
 // utils/expandCollapseUtils.js
 
-export async function expandSection(page, sectionLabel) {
-  const sectionToggle = page.locator(`text=${sectionLabel} >> xpath=../..//button[contains(@aria-label, "Expand")]`);
-  if (await sectionToggle.isVisible()) {
-    console.log(`⏩ Expanding "${sectionLabel}"...`);
-    await sectionToggle.click();
-  } else {
-    console.log(`✅ "${sectionLabel}" already expanded or no expand control found.`);
+async function openTriggerIfPresent(page, selector) {
+  if (!selector) return;
+  const element = page.locator(selector);
+  if (await element.isVisible()) {
+    console.log(`🔘 Clicking: ${selector}`);
+    await element.click();
   }
 }
 
-export async function collapseSection(page, sectionLabel) {
-  const sectionToggle = page.locator(`text=${sectionLabel} >> xpath=../..//button[contains(@aria-label, "Collapse")]`);
-  if (await sectionToggle.isVisible()) {
-    console.log(`⏬ Collapsing "${sectionLabel}"...`);
-    await sectionToggle.click();
-  } else {
-    console.log(`✅ "${sectionLabel}" already collapsed or no collapse control found.`);
-  }
+async function expandSection(page, label) {
+  const toggle = page.locator(`text=${label} >> xpath=../..//button[contains(@aria-label, "Expand")]`);
+  if (await toggle.isVisible()) await toggle.click();
 }
 
-export async function isSectionExpanded(page, sectionLabel) {
-  const expandedSection = page.locator(`text=${sectionLabel} >> xpath=../..`);
-  const ariaExpanded = await expandedSection.getAttribute('aria-expanded');
-  return ariaExpanded === 'true';
+async function collapseSection(page, label) {
+  const toggle = page.locator(`text=${label} >> xpath=../..//button[contains(@aria-label, "Collapse")]`);
+  if (await toggle.isVisible()) await toggle.click();
 }
 
+async function isSectionExpanded(page, label) {
+  const section = page.locator(`text=${label} >> xpath=../..`);
+  const expanded = await section.getAttribute('aria-expanded');
+  return expanded === 'true';
+}
+
+module.exports = {
+  handleGenericForm,
+  switchToTabOrModule,
+  clickButton,
+  waitUntilPageIsReady,
+  performKeyboardActions,
+  sendAndValidateInvites,
+  verifyTooltip,
+  openTriggerIfPresent,
+  expandSection,
+  collapseSection,
+  isSectionExpanded
+}

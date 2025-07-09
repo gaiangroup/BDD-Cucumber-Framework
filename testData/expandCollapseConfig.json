@@ -1,0 +1,7 @@
+{
+  "chatbotPanel": {
+    "openTriggerSelector": "mobius-div[id*='input'][id$='box']",  
+    "panelSelector": "mobius-conditional-renderer[id*='bg'][id*='one'] img[class*='rounded']",
+    "collapseButtonSelector": "mobius-conditional-renderer[id*='bg'][id*='two'] img[class*='rounded']"
+  }
+}

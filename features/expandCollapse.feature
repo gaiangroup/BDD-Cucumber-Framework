@@ -1,16 +1,8 @@
-Feature: Expand/Collapse Interactions
-  As a QA Engineer
-  I want to automate expand/collapse of UI elements dynamically
-  So that I can ensure the UI behaves as expected
+@expandCollapse
+Feature: Chatbot Expand/Collapse Interactions
 
-  @expandCollapse
-  Scenario: User expands and collapses a UI section
-    Given User navigates to the application
-    When User expands the section "Dashboard Panel"
-    Then The section "Dashboard Panel" should be expanded
-
-  @expandCollapse
-  Scenario: User collapses the same UI section
-    Given User navigates to the application
-    When User collapses the section "Dashboard Panel"
-    Then The section "Dashboard Panel" should be collapsed
+  Scenario: User expands and collapses the chatbot panel from dashboard
+    Given User navigate to the login page
+    When User login with valid credentials and successful login
+    Then Section should be expanded for "chatbotPanel"
+    And Section should be collapsed for "chatbotPanel"
