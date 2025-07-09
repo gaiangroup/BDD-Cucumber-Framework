@@ -644,33 +644,15 @@ export async function sendAndValidateInvites(page, config) {
     console.log(`✅ Entered email: ${email}`);
   }
 
-<<<<<<< HEAD
+
   // Step 2: Click Send Invites button
   const sendBtn = page.locator(`xpath=(//*[text() = "${sendButton}"])[1]`);
   await sendBtn.waitFor({ state: "visible", timeout: 10000 });
   await sendBtn.click();
   console.log("✅ Clicked send button");
-=======
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-  // Step 2: Click send button
-  const sendButtonLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.sendButton}")]//ancestor::button)[1]`);
-  await sendButtonLocator.waitFor({ state: "visible", timeout: 10000 });
-  await sendButtonLocator.click();
-  console.log(`✅ Clicked send button`);
->>>>>>> b8e9c73a6477e96ef9dea6af53513d939d877aa9
 
   // Step 3: Wait for success modal
   const modal = page.locator(`xpath=(//*[@*="${successModal}"])[1]`);
