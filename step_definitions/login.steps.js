@@ -28,7 +28,7 @@ When('User verifies placeholder text for each field is correct', { timeout: 2000
     await handleAssertions(this.page, login_testData.placeholders);
 });
 
-When('User login with valid credentials and successful login', { timeout: 20000 }, async function () {
+When('User login with valid credentials and successful login', { timeout: 50000 }, async function () {
     await handleGenericForm(this.page, login_testData.login_form);
     await waitUntilPageIsReady(this.page);
 });

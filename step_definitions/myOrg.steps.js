@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites,validateTableHeadersByColumnNames } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const fs = require('fs');
 const path = require('path');
@@ -94,3 +94,26 @@ Then('User should send the invitation and validate the subject', { timeout: 2000
     const result = await sendAndValidateInvites(this.page, myOrg_json);
     console.log(result);
 });
+
+Then(
+  'User clicks on {string} tab and verifies the following table headers:',
+  { timeout: 50000 },
+  async function (tabName, dataTable) {
+    const tabIndexMap = {
+     'Roles & Privileges': 1,
+     'Teams': 2,
+      'Users': 3,  
+    };
+
+    const tabIndex = tabIndexMap[tabName];
+    if (tabIndex === undefined) {
+      throw new Error(`Tab "${tabName}" is not mapped. Please update tabIndexMap.`);
+    }
+
+    await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
+
+    const columnNames = dataTable.raw().flat();
+    await validateTableHeadersByColumnNames(this.page, columnNames);
+  }
+);
+
