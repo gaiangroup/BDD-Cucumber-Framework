@@ -81,7 +81,7 @@
         {
             "key": "Tab",
             "repeat": 3,
-            "wait": 300
+            "wait": 500
         }
     ],
     "teamCreation_form": {

@@ -392,13 +392,13 @@ export async function clickButton(page, buttonConfig) {
   const count = await button.count();
   if (count === 0) {
     console.warn(`Button with label "${label}" not found.`);
-    const allButtons = await page.locator('//mobius-button').allTextContents();
+   // const allButtons = await page.locator('//mobius-button').allTextContents();
     console.log('Available buttons on screen:', allButtons);
     return;
   }
 
   try {
-    await button.waitFor({ state: 'visible', timeout: 5000 });
+    await button.waitFor({ state: 'visible', timeout: 7000 });
     await expect(button).toBeEnabled({ timeout: 5000 });
     await button.click();
     console.log(`Clicked on button: "${label}"`);
@@ -453,31 +453,32 @@ export async function sendAndValidateInvites(page, config) {
   const imapPass = process.env.GMAIL_PASS;
 
   const emailList = Array.isArray(config.emails) ? config.emails : [config.emails];
-
+  
   // Step 1: Fill email inputs
   for (const email of emailList) {
-    const emailInputLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.emailInput}")]//following::*[1])`);
+    
+    const emailInputLocator = page.locator(`xpath=(//*[@data-placeholder="${config.labels.emailInput}"])[1]`);
     await emailInputLocator.waitFor({ state: "visible", timeout: 10000 });
     await emailInputLocator.fill(email);
     await page.keyboard.press("Enter");
     await page.waitForTimeout(500);
-    console.log(`✅ Entered email: ${email}`);
+    console.log(`Entered email: ${email}`);
   }
 
   // Step 2: Click send button
-  const sendButtonLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.sendButton}")]//ancestor::button)[1]`);
+  const sendButtonLocator = page.locator(`xpath=(//*[text() = "${config.labels.sendButton}"])[1]`);
   await sendButtonLocator.waitFor({ state: "visible", timeout: 10000 });
   await sendButtonLocator.click();
-  console.log(`✅ Clicked send button`);
+  console.log(`Clicked send button`);
 
   // Step 3: Wait for success modal
-  const successModalLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.successModal}")])[1]`);
+  const successModalLocator = page.locator(`xpath=(//*[@*="${config.labels.successModal}"])[1]`);
   await successModalLocator.waitFor({ state: "visible", timeout: 15000 });
-  console.log(`✅ Success modal appeared`);
+  console.log(`Success modal appeared`);
 
   // Step 4: Decide whether to use Gmail IMAP or Mailinator
   if (imapUser && imapPass) {
-    console.log(`🔑 Detected Gmail credentials, using IMAP...`);
+    console.log(`Detected Gmail credentials, using IMAP...`);
     const { default: Imap } = await import('imap');
     const { simpleParser } = await import('mailparser');
 
@@ -502,7 +503,7 @@ export async function sendAndValidateInvites(page, config) {
             return reject(err);
           }
 
-          console.log(`🔍 Searching inbox for subject: "${config.subject}"`);
+          console.log(`Searching inbox for subject: "${config.subject}"`);
           const criteria = ["UNSEEN", ["SUBJECT", config.subject]];
 
           imap.search(criteria, (err, results) => {
@@ -512,7 +513,7 @@ export async function sendAndValidateInvites(page, config) {
             }
             if (!results.length) {
               imap.end();
-              return reject(new Error(`❌ No emails found with subject "${config.subject}"`));
+              return reject(new Error(`No emails found with subject "${config.subject}"`));
             }
 
             const f = imap.fetch(results, { bodies: "" });
@@ -522,7 +523,7 @@ export async function sendAndValidateInvites(page, config) {
               msg.on("body", (stream) => {
                 simpleParser(stream, (err, mail) => {
                   if (err) return;
-                  console.log(`✅ Email received: "${mail.subject}"`);
+                  console.log(`Email received: "${mail.subject}"`);
                   found = true;
                 });
               });
@@ -531,9 +532,9 @@ export async function sendAndValidateInvites(page, config) {
             f.once("end", () => {
               imap.end();
               if (found) {
-                resolve(`✅ Email with subject "${config.subject}" received.`);
+                resolve(`Email with subject "${config.subject}" received.`);
               } else {
-                reject(new Error(`❌ No matching email body parsed.`));
+                reject(new Error(`No matching email body parsed.`));
               }
             });
           });
@@ -544,7 +545,7 @@ export async function sendAndValidateInvites(page, config) {
       imap.connect();
     });
   } else {
-    console.log(`📨 No Gmail credentials found. Falling back to Mailinator...`);
+    console.log(`No Gmail credentials found. Falling back to Mailinator...`);
 
     // Wait a few seconds to allow email delivery
     await new Promise((r) => setTimeout(r, 10000));
@@ -556,18 +557,184 @@ export async function sendAndValidateInvites(page, config) {
 
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      throw new Error(`❌ Mailinator fetch failed: ${response.status}`);
+      throw new Error(`Mailinator fetch failed: ${response.status}`);
     }
 
     const data = await response.json();
     const message = data.messages.find((msg) => msg.subject.includes(config.subject));
 
     if (!message) {
-      throw new Error(`❌ No email found in Mailinator inbox "${inbox}" with subject containing "${config.subject}"`);
+      throw new Error(`No email found in Mailinator inbox "${inbox}" with subject containing "${config.subject}"`);
     }
 
-    console.log(`✅ Mailinator email received: "${message.subject}"`);
-    return `✅ Mailinator: Email with subject "${message.subject}" received.`;
+    console.log(`Mailinator email received: "${message.subject}"`);
+    return `Mailinator: Email with subject "${message.subject}" received.`;
   }
 }
 
+//************ HANDLE ASSERTIONS***************************
+import fs from 'fs';
+import path from 'path';
+import { PNG } from 'pngjs';
+import pixelmatch from 'pixelmatch';
+
+export async function handleAssertions(page, data = {}) {
+//*********************Assertion for default text in input fields*********************/
+  if (data.inputs) {
+    for (const { label, expectedValue } of data.inputs) {
+      const locator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
+      const value = await locator.textContent();
+      expect(value?.trim()).toBe(expectedValue);
+      console.log(`Input "${label}" matched expected value: "${expectedValue}"`);
+    }
+  }
+//*********************Assertion for errors*********************/
+  if (data.errors) {
+    for (const { errorMessage } of data.errors) {
+      const errorLocator = page.locator(`text=${errorMessage}`);
+      await expect(errorLocator).toBeVisible({ timeout: 5000 });
+      console.log(`Error message visible: "${errorMessage}"`);
+    }
+  }
+//*********************Assertion for Placeholders text*********************/
+  if (data.placeholders) {
+    for (const { descriptionOfField, expectedPlaceholder } of data.placeholders) {
+      // This assumes there's a single input with the expected placeholder
+      const locator = page.locator(`xpath=(//*[@data-placeholder='${expectedPlaceholder}'])[1]`);
+      const isVisible = await locator.isVisible();
+
+      if (!isVisible) {
+        throw new Error(`Input with placeholder "${expectedPlaceholder}" for "${descriptionOfField}" is not visible`);
+      }
+
+      const actualPlaceholder = await locator.getAttribute('data-placeholder');
+      console.log('The text of Actual Placeholder captured during runtime is ' + actualPlaceholder);
+      if (actualPlaceholder?.trim() !== expectedPlaceholder.trim()) {
+        throw new Error(`Placeholder mismatch for "${descriptionOfField}": Expected "${expectedPlaceholder}", but got "${actualPlaceholder}"`);
+      }
+
+      console.log(`Placeholder matched for "${descriptionOfField}": "${expectedPlaceholder}"`);
+    }
+  }
+
+//*********************Assertion for visible text*********************/
+  if (data.texts) {
+    for (const { descriptionOfField, expectedVisibleText } of data.texts) {
+      const locator = page.locator(`xpath=(//*[normalize-space()='${expectedVisibleText}'])[1]`);
+      const isVisible = await locator.isVisible();
+
+      if (!isVisible) {
+        throw new Error(`Text not visible: Expected "${expectedVisibleText}" for "${descriptionOfField}"`);
+      }
+
+      const actualText = await locator.innerText();
+      console.log('The Actual text of field captured during runtime is ' + actualText);
+      if (actualText.trim() !== expectedVisibleText.trim()) {
+        throw new Error(`Text mismatch for "${descriptionOfField}": Expected "${expectedVisibleText}", but got "${actualText}"`);
+      } else {
+        console.log(`Text matched for "${descriptionOfField}": "${expectedVisibleText}"`);
+      }
+    }
+  }
+
+
+  if (data.tags) {
+    for (const { label, expectedTags } of data.tags) {
+      for (const tag of expectedTags) {
+        const tagLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-tag[text()='${tag}'])[1]`);
+        await expect(tagLocator).toBeVisible();
+        console.log(`Tag "${tag}" under "${label}" is visible`);
+      }
+    }
+  }
+
+  if (data.dropdowns) {
+    for (const { label, expectedSelected } of data.dropdowns) {
+      const selectedLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-dropdown-input-container)[1]`);
+      const selectedValue = await selectedLocator.textContent();
+      expect(selectedValue?.trim()).toBe(expectedSelected);
+      console.log(`Dropdown "${label}" selected value matched: "${expectedSelected}"`);
+    }
+  }
+
+  if (data.attributes) {
+    for (const { label, attribute, expected } of data.attributes) {
+      const locator = page.locator(`xpath=(//*[contains(text(),'${label}')])[1]`);
+      const attrVal = await locator.getAttribute(attribute);
+      const isTruthy = attrVal !== null && attrVal !== 'false';
+      expect(isTruthy).toBe(expected);
+      console.log(`Attribute "${attribute}" on "${label}" is ${expected}`);
+    }
+  }
+//*********************Assertion for Screenshots*********************/
+  if (data.screenshots) {
+    for (const { expectedName, folder = 'screenshots' } of data.screenshots) {
+      // ========== TIMESTAMP SETUP ==========
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12; // Convert 0 to 12 for 12AM
+
+      // Use colons between time parts
+      const timestamp = `${year}-${month}-${day}_${hours}:${minutes}:${seconds}_${ampm}`;
+
+
+
+      // Create subfolders for actual, expected, and diff
+      const expectedDir = path.join(folder, 'expected');
+      const actualDir = path.join(folder, 'actual');
+      const diffDir = path.join(folder, 'diff');
+
+      // Ensure folders exist
+      [expectedDir, actualDir, diffDir].forEach(dir => {
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      });
+
+      // File paths
+      const actualPath = path.join(actualDir, `${expectedName}_actual_${timestamp}.png`);
+      const expectedPath = path.join(expectedDir, `${expectedName}_expected_${timestamp}.png`);
+      const diffPath = path.join(diffDir, `${expectedName}_diff_${timestamp}.png`);
+      // Take actual screenshot
+      await page.screenshot({ path: actualPath, fullPage: true });
+      console.log(`Actual screenshot saved: ${actualPath}`);
+
+      // Save expected screenshot if not already saved
+      if (!fs.existsSync(expectedPath)) {
+        fs.copyFileSync(actualPath, expectedPath);
+        console.log(`Expected screenshot created: ${expectedPath}`);
+        continue;
+      }
+
+      // Compare screenshots
+      const actual = PNG.sync.read(fs.readFileSync(actualPath));
+      const expected = PNG.sync.read(fs.readFileSync(expectedPath));
+      const { width, height } = actual;
+      const diff = new PNG({ width, height });
+
+      const diffPixels = pixelmatch(actual.data, expected.data, diff.data, width, height, {
+        threshold: 0.1,
+      });
+
+      // Save diff image
+      fs.writeFileSync(diffPath, PNG.sync.write(diff));
+
+      if (diffPixels > 0) {
+        console.error(`Screenshot mismatch: ${diffPixels} pixels differ.`);
+        console.error(`Diff saved to: ${diffPath}`);
+        throw new Error(`Screenshot mismatch for: ${expectedName}`);
+      } else {
+        console.log(`Screenshot matched for: ${expectedName}`);
+      }
+    }
+  }
+
+
+
+  console.log('All assertions passed!');
+}

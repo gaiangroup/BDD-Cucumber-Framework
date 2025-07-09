@@ -21,6 +21,8 @@
   },
   "dependencies": {
     "imap": "^0.8.19",
-    "mailparser": "^3.7.4"
+    "mailparser": "^3.7.4",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0"
   }
 }

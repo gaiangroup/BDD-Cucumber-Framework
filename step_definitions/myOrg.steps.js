@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions,sendAndValidateInvites } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const fs = require('fs');
 const path = require('path');
@@ -28,27 +28,27 @@ After(async function (scenario) {
     }
 });
 
-When('User switches to My Organization tab', async function () {
+When('User switches to My Organization tab', { timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[0]);
 });
 
-When('User clicks on Role tab', async function () {
+When('User clicks on Role tab', { timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[1]);
 });
 
-When('User allows location access', async function () {
+When('User allows location access', { timeout: 20000 }, async function () {
     await this.page.waitForTimeout(2000);
     await performKeyboardActions(this.page, myOrg_json.keyboardAction);
 });
 
-When('User clicks on New Role button', async function () {
+When('User clicks on New Role button', { timeout: 20000 }, async function () {
     await this.page.waitForTimeout(2000);
     await clickButton(this.page, myOrg_json.button[1]);
 });
 
-Then('User should see the role creation form and fill in the details',{ timeout: 60 * 1000 }, async function () {
+Then('User should see the role creation form and fill in the details', { timeout: 20000 }, async function () {
     await handleGenericForm(this.page, myOrg_json.roleForm_stepper1);
     console.log("Stepper 1 form submitted. Waiting before filling Stepper 2...");
     await waitUntilPageIsReady(this.page); // Ensure page is ready before next step
@@ -60,34 +60,37 @@ Then('User should see the role creation form and fill in the details',{ timeout:
 });
 
 // ********************Team Creation Steps*****************************************
-When('User clicks on Teams tab', async function () {
+When('User clicks on Teams tab', { timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[2]);
 });
 
-When('User clicks on Add Team button',{ timeout: 60 * 1000 }, async function () {
+When('User clicks on Add Team button', { timeout: 20000 }, async function () {
     await this.page.waitForTimeout(2000);
     await clickButton(this.page, myOrg_json.button[2]);
 });
 
-Then('User should see the Team creation form and fill in the details',{ timeout: 60 * 1000 }, async function () {
+Then('User should see the Team creation form and fill in the details', { timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await handleGenericForm(this.page, myOrg_json.teamCreation_form);
 });
 
-//*************** */
-When('User clicks on Users tab', async function () {
+//********************User Invitation******************/
+When('User clicks on Users tab', { timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[3]);
 });
 
-When('User clicks on Invite Users button',{ timeout: 60 * 1000 }, async function () {
+When('User clicks on Invite Users button', { timeout: 20000 }, async function () {
+    //await this.page.reload();
     await waitUntilPageIsReady(this.page);
-   await clickButton(this.page, myOrg_json.button[3]);
+    await clickButton(this.page, myOrg_json.button[3]);
+    console.log("Invite Users button clicked. Waiting for form to appear...");
 });
 
-Then('User should send the invitation and validate the subject',{ timeout: 60 * 2000 }, async function () {
+Then('User should send the invitation and validate the subject', { timeout: 20000 }, async function () {
+    await this.page.reload();
     await waitUntilPageIsReady(this.page);
-    const result =await sendAndValidateInvites(this.page, myOrg_json);
+    const result = await sendAndValidateInvites(this.page, myOrg_json);
     console.log(result);
 });
