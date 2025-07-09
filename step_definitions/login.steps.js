@@ -1,7 +1,7 @@
 const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
 const { expect } = require('chai');
-const { handleGenericForm,waitUntilPageIsReady } = require('../utils/commonFunctions');
+const { handleGenericForm, waitUntilPageIsReady, handleAssertions } = require('../utils/commonFunctions');
 const login_testData = require('../testData/login.json');
 
 let browser;
@@ -16,8 +16,16 @@ After(async function () {
     await browser.close();
 });
 
-Given('User navigate to the login page', async function () {
-    await this.page.goto('https://qa-runrun-ui.aidtaas.com/');
+Given('User navigate to the login page', { timeout: 20000 }, async function () {
+    await this.page.goto(login_testData.baseUrl);
+});
+
+When('User verifies all input field labels are correct', { timeout: 20000 }, async function () {
+    await handleAssertions(this.page, login_testData.texts);
+});
+
+When('User verifies placeholder text for each field is correct', { timeout: 20000 }, async function () {
+    await handleAssertions(this.page, login_testData.placeholders);
 });
 
 When('User login with valid credentials and successful login', { timeout: 50000 }, async function () {
@@ -25,12 +33,15 @@ When('User login with valid credentials and successful login', { timeout: 50000 
     await waitUntilPageIsReady(this.page);
 });
 
-Then('User login with invalid credentials', async function () {
-    await handleGenericForm(this.page, login_testData.login_Invalidcred);
-     
+Then('User attempts login with an invalid email and invalid password,and verifies the error', { timeout: 20000 }, async function () {
+    await handleGenericForm(this.page, login_testData.negativeTestData_1);
 });
 
+Then('User attempts login with a valid email and an invalid password,and verifies the error', { timeout: 20000 }, async function () {
+    await this.page.reload();
+    await handleGenericForm(this.page, login_testData.negativeTestData_2);
+});
 
 Then('User should see the Dashboard as home page', async function () {
-    console.log("Login successful, checking for Dashboard...");
+    await handleAssertions(this.page, login_testData.screenshots);
 });

@@ -78,12 +78,13 @@
         }
     ],
     "keyboardAction": [
-        {
-            "key": "Tab",
-            "repeat": 3,
-            "wait": 300
-        }
-    ],
+  {
+    "key": "Tab",
+    "repeat": 3,
+    "wait": 500
+  }
+]
+,
     "teamCreation_form": {
         "buttonText": "Save",
         "matchIndex": 1,
@@ -118,7 +119,7 @@
     "labels": {
     "emailInput": "Enter mails here to invite people",
     "sendButton": "Send Invites",
-    "successModal": "Your team invitations are on the way!"
+    "successModal": "ConfirmInvitesModal"
   },
     "subject": "Youve been invited to join RunRun as a Tenant User"
 }
