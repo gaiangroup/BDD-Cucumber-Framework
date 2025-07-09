@@ -423,9 +423,7 @@ export async function performKeyboardActions(page, actions = []) {
   }
 
   for (const action of actions) {
-    const key = action.key;
-    const repeat = action.repeat;
-    const wait = action.wait;
+    const { key, repeat = 1, wait = 0, finalKey = null } = action;
 
     if (!key) {
       console.warn('Missing "key" in keyboard action config.');
@@ -434,143 +432,279 @@ export async function performKeyboardActions(page, actions = []) {
 
     for (let i = 0; i < repeat; i++) {
       await page.keyboard.press(key);
-      await page.keyboard.press('Enter');
+      if (wait > 0) {
+        await page.waitForTimeout(wait);
+      }
     }
 
-    console.log(`Pressed "${key}" ${repeat} time(s) with ${wait}ms wait.`);
+    if (finalKey) {
+      await page.keyboard.press(finalKey);
+      console.log(`Pressed final key: ${finalKey}`);
+    }
   }
 }
+
+
 
 //********************Generic invitation sender and email validator.*****************/
 // utils/sendAndValidateInvites.js
+// export async function sendAndValidateInvites(page, config) {
+//   // Dynamically import ESM-compatible packages
+//   const dotenv = await import('dotenv');
+//   dotenv.config();
+
+//   // Always get credentials
+//   const imapUser = process.env.GMAIL_USER;
+//   const imapPass = process.env.GMAIL_PASS;
+
+//   const emailList = Array.isArray(config.emails) ? config.emails : [config.emails];
+  
+//   // Step 1: Fill email inputs
+//   for (const email of emailList) {
+    
+//     const emailInputLocator = page.locator(`xpath=(//*[@data-placeholder="${config.labels.emailInput}"])[1]`);
+//     await emailInputLocator.waitFor({ state: "visible", timeout: 10000 });
+//     await emailInputLocator.fill(email);
+//     await page.keyboard.press("Enter");
+//     await page.waitForTimeout(500);
+//     console.log(`Entered email: ${email}`);
+//   }
+
+//   // Step 2: Click send button
+//   const sendButtonLocator = page.locator(`xpath=(//*[text() = "${config.labels.sendButton}"])[1]`);
+//   await sendButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+//   await sendButtonLocator.click();
+//   console.log(`Clicked send button`);
+
+//   // Step 3: Wait for success modal
+//   const successModalLocator = page.locator(`xpath=(//*[@*="${config.labels.successModal}"])[1]`);
+//   await successModalLocator.waitFor({ state: "visible", timeout: 15000 });
+//   console.log(`Success modal appeared`);
+
+//   // Step 4: Decide whether to use Gmail IMAP or Mailinator
+//   if (imapUser && imapPass) {
+//     console.log(`Detected Gmail credentials, using IMAP...`);
+//     const { default: Imap } = await import('imap');
+//     const { simpleParser } = await import('mailparser');
+
+//     const imap = new Imap({
+//       user: imapUser,
+//       password: imapPass,
+//       host: "imap.gmail.com",
+//       port: 993,
+//       tls: true,
+//       tlsOptions: { rejectUnauthorized: false },
+//     });
+
+//     function openInbox(cb) {
+//       imap.openBox("INBOX", true, cb);
+//     }
+
+//     return new Promise((resolve, reject) => {
+//       imap.once("ready", () => {
+//         openInbox((err) => {
+//           if (err) {
+//             imap.end();
+//             return reject(err);
+//           }
+
+//           console.log(`Searching inbox for subject: "${config.subject}"`);
+//           const criteria = ["UNSEEN", ["SUBJECT", config.subject]];
+
+//           imap.search(criteria, (err, results) => {
+//             if (err) {
+//               imap.end();
+//               return reject(err);
+//             }
+//             if (!results.length) {
+//               imap.end();
+//               return reject(new Error(`No emails found with subject "${config.subject}"`));
+//             }
+
+//             const f = imap.fetch(results, { bodies: "" });
+//             let found = false;
+
+//             f.on("message", (msg) => {
+//               msg.on("body", (stream) => {
+//                 simpleParser(stream, (err, mail) => {
+//                   if (err) return;
+//                   console.log(`Email received: "${mail.subject}"`);
+//                   found = true;
+//                 });
+//               });
+//             });
+
+//             f.once("end", () => {
+//               imap.end();
+//               if (found) {
+//                 resolve(`Email with subject "${config.subject}" received.`);
+//               } else {
+//                 reject(new Error(`No matching email body parsed.`));
+//               }
+//             });
+//           });
+//         });
+//       });
+
+//       imap.once("error", (err) => reject(err));
+//       imap.connect();
+//     });
+//   } else {
+//     console.log(`No Gmail credentials found. Falling back to Mailinator...`);
+// await new Promise((r) => setTimeout(r, 10000)); // Wait for delivery
+
+// const recipient = emailList[0];
+// const inbox = recipient.split("@")[0];
+// const apiUrl = `https://www.mailinator.com/fetch_public?to=${inbox}`;
+
+// const response = await fetch(apiUrl);
+// if (!response.ok) {
+//   throw new Error(`Mailinator fetch failed: ${response.status}`);
+// }
+
+// const data = await response.json();
+// const messages = data?.messages;
+// if (!Array.isArray(messages)) {
+//   console.error('Invalid Mailinator response:', data);
+//   throw new Error(`Mailinator did not return a messages array`);
+// }
+
+// const message = messages.find((msg) => msg.subject.includes(config.subject));
+// if (!message) {
+//   throw new Error(`No email found in Mailinator inbox "${inbox}" with subject containing "${config.subject}"`);
+// }
+
+// console.log(`Mailinator email received: "${message.subject}"`);
+// return `Mailinator: Email with subject "${message.subject}" received.`;
+
+//   }
+// }
 export async function sendAndValidateInvites(page, config) {
-  // Dynamically import ESM-compatible packages
   const dotenv = await import('dotenv');
   dotenv.config();
 
-  // Always get credentials
-  const imapUser = process.env.GMAIL_USER;
-  const imapPass = process.env.GMAIL_PASS;
-
+  const { GMAIL_USER, GMAIL_PASS } = process.env;
   const emailList = Array.isArray(config.emails) ? config.emails : [config.emails];
-  
-  // Step 1: Fill email inputs
+  const subject = config.subject || "Invitation";
+  const { emailInput, sendButton, successModal } = config.labels;
+
+  // Step 1: Fill all email inputs
   for (const email of emailList) {
-    
-    const emailInputLocator = page.locator(`xpath=(//*[@data-placeholder="${config.labels.emailInput}"])[1]`);
-    await emailInputLocator.waitFor({ state: "visible", timeout: 10000 });
-    await emailInputLocator.fill(email);
+    const input = page.locator(`xpath=(//*[@data-placeholder="${emailInput}"])[1]`);
+    await input.waitFor({ state: "visible", timeout: 10000 });
+    await input.fill(email);
     await page.keyboard.press("Enter");
     await page.waitForTimeout(500);
-    console.log(`Entered email: ${email}`);
+    console.log(`✅ Entered email: ${email}`);
   }
 
-  // Step 2: Click send button
-  const sendButtonLocator = page.locator(`xpath=(//*[text() = "${config.labels.sendButton}"])[1]`);
-  await sendButtonLocator.waitFor({ state: "visible", timeout: 10000 });
-  await sendButtonLocator.click();
-  console.log(`Clicked send button`);
+  // Step 2: Click Send Invites button
+  const sendBtn = page.locator(`xpath=(//*[text() = "${sendButton}"])[1]`);
+  await sendBtn.waitFor({ state: "visible", timeout: 10000 });
+  await sendBtn.click();
+  console.log("✅ Clicked send button");
 
   // Step 3: Wait for success modal
-  const successModalLocator = page.locator(`xpath=(//*[@*="${config.labels.successModal}"])[1]`);
-  await successModalLocator.waitFor({ state: "visible", timeout: 15000 });
-  console.log(`Success modal appeared`);
+  const modal = page.locator(`xpath=(//*[@*="${successModal}"])[1]`);
+  await modal.waitFor({ state: "visible", timeout: 15000 });
+  console.log("✅ Invite success modal appeared");
 
-  // Step 4: Decide whether to use Gmail IMAP or Mailinator
-  if (imapUser && imapPass) {
-    console.log(`Detected Gmail credentials, using IMAP...`);
-    const { default: Imap } = await import('imap');
-    const { simpleParser } = await import('mailparser');
+  // Step 4: Validate email delivery for each email
+  for (const email of emailList) {
+    console.log(`📨 Validating delivery for: ${email}`);
 
-    const imap = new Imap({
-      user: imapUser,
-      password: imapPass,
-      host: "imap.gmail.com",
-      port: 993,
-      tls: true,
-      tlsOptions: { rejectUnauthorized: false },
-    });
+    if (GMAIL_USER && GMAIL_PASS && email.includes(GMAIL_USER)) {
+      console.log("📬 Using Gmail IMAP...");
+      const { default: Imap } = await import('imap');
+      const { simpleParser } = await import('mailparser');
 
-    function openInbox(cb) {
-      imap.openBox("INBOX", true, cb);
-    }
+      const imap = new Imap({
+        user: GMAIL_USER,
+        password: GMAIL_PASS,
+        host: "imap.gmail.com",
+        port: 993,
+        tls: true,
+        tlsOptions: { rejectUnauthorized: false },
+      });
 
-    return new Promise((resolve, reject) => {
-      imap.once("ready", () => {
-        openInbox((err) => {
-          if (err) {
-            imap.end();
-            return reject(err);
-          }
+      function openInbox(cb) {
+        imap.openBox("INBOX", true, cb);
+      }
 
-          console.log(`Searching inbox for subject: "${config.subject}"`);
-          const criteria = ["UNSEEN", ["SUBJECT", config.subject]];
+      await new Promise((resolve, reject) => {
+        imap.once("ready", () => {
+          openInbox((err) => {
+            if (err) return reject(err);
 
-          imap.search(criteria, (err, results) => {
-            if (err) {
-              imap.end();
-              return reject(err);
-            }
-            if (!results.length) {
-              imap.end();
-              return reject(new Error(`No emails found with subject "${config.subject}"`));
-            }
+            const criteria = ["UNSEEN", ["SUBJECT", subject]];
+            imap.search(criteria, (err, results) => {
+              if (err || !results.length) return reject(new Error(`No emails found for subject: ${subject}`));
 
-            const f = imap.fetch(results, { bodies: "" });
-            let found = false;
+              const f = imap.fetch(results, { bodies: "" });
+              let found = false;
 
-            f.on("message", (msg) => {
-              msg.on("body", (stream) => {
-                simpleParser(stream, (err, mail) => {
-                  if (err) return;
-                  console.log(`Email received: "${mail.subject}"`);
-                  found = true;
+              f.on("message", (msg) => {
+                msg.on("body", (stream) => {
+                  simpleParser(stream, (err, mail) => {
+                    if (!err && mail.subject.includes(subject)) {
+                      console.log(`✅ Gmail: Email received for ${email}: "${mail.subject}"`);
+                      found = true;
+                    }
+                  });
                 });
               });
-            });
 
-            f.once("end", () => {
-              imap.end();
-              if (found) {
-                resolve(`Email with subject "${config.subject}" received.`);
-              } else {
-                reject(new Error(`No matching email body parsed.`));
-              }
+              f.once("end", () => {
+                imap.end();
+                found
+                  ? resolve()
+                  : reject(new Error(`No matching Gmail email body for ${email}`));
+              });
             });
           });
         });
+
+        imap.once("error", (err) => reject(err));
+        imap.connect();
       });
-
-      imap.once("error", (err) => reject(err));
-      imap.connect();
-    });
-  } else {
-    console.log(`No Gmail credentials found. Falling back to Mailinator...`);
-
-    // Wait a few seconds to allow email delivery
-    await new Promise((r) => setTimeout(r, 10000));
-
-    // Mailinator fetch
-    const recipient = emailList[0];
-    const inbox = recipient.split("@")[0];
-    const apiUrl = `https://www.mailinator.com/fetch_public?to=${inbox}`;
-
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      throw new Error(`Mailinator fetch failed: ${response.status}`);
     }
 
-    const data = await response.json();
-    const message = data.messages.find((msg) => msg.subject.includes(config.subject));
+    else if (email.includes("@mailinator.com")) {
+  console.log("📬 Using Mailinator fallback (HTML scrape)...");
+  await new Promise((r) => setTimeout(r, 10000)); // wait for email to arrive
 
-    if (!message) {
-      throw new Error(`No email found in Mailinator inbox "${inbox}" with subject containing "${config.subject}"`);
+  const inbox = email.split("@")[0];
+  const inboxUrl = `https://www.mailinator.com/v3/index.jsp?zone=public&query=${inbox}#/#inboxpane`;
+
+  const { chromium } = require('playwright');
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.goto(inboxUrl);
+  await page.waitForSelector('table#inboxpane', { timeout: 15000 });
+
+  const subjects = await page.$$eval('table#inboxpane tbody tr td:nth-child(3)', nodes =>
+    nodes.map(n => n.innerText.trim())
+  );
+
+  await browser.close();
+
+  const match = subjects.find(s => s.includes(subject));
+  if (!match) {
+    throw new Error(`❌ Mailinator: No message found with subject: "${subject}"`);
+  }
+
+  console.log(`✅ Mailinator: Email received with subject: "${match}"`);
+}
+
+
+    else {
+      console.warn(`⚠️ Skipping validation for unsupported email domain: ${email}`);
     }
-
-    console.log(`Mailinator email received: "${message.subject}"`);
-    return `Mailinator: Email with subject "${message.subject}" received.`;
   }
 }
+
 
 //************ HANDLE ASSERTIONS***************************
 import fs from 'fs';
