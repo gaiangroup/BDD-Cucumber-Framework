@@ -1,0 +1,18 @@
+{
+  "fields": {
+    "RAID Configuration": {
+      "value": "RAID 5",
+      "type": "dropdown"
+    },
+    "Location": {
+      "value": "India",
+      "type": "input"
+    },
+    "Capacity": {
+      "value": "789",
+      "type": "input"
+    }
+  },
+  "buttonText": "Update",
+  "expectedToast": "Storage is updated Successfully"
+}

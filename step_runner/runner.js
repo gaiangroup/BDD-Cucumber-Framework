@@ -2,7 +2,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const defaultTag = '@expandCollapse';
+const defaultTag = '@editStorage';
 
 const defaultFeatureDir = 'features';
 const reportJsonPath = path.join(__dirname, '..', 'reports', 'cucumber_report.json');

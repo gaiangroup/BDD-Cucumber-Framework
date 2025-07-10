@@ -459,6 +459,114 @@ async function isSectionExpanded(page, label) {
   return expanded === 'true';
 }
 
+
+// ******************** Navigate to Infra Page ********************/
+async function goToInfraSection(page, sectionName, infraName) {
+  await page.click(`text=${sectionName}`);
+  await page.waitForSelector(`text=${infraName}`, { timeout: 10000 });
+
+  const row = page.locator(`xpath=//tbody//mobius-tr[.//text()[contains(., "${infraName}")]]`);
+  await row.waitFor({ state: 'visible', timeout: 10000 });
+
+  const moreOptionsIcon = row.locator('img.cursor-pointer').first();
+  await moreOptionsIcon.waitFor({ state: 'visible', timeout: 10000 });
+  await moreOptionsIcon.click();
+
+  const viewInfraBtn = row.locator(`xpath=.//mobius-div[contains(text(), "View Infrastructure")]`);
+  await viewInfraBtn.waitFor({ state: 'visible', timeout: 10000 });
+  await viewInfraBtn.click();
+
+  console.log(`✅ Navigated to Infrastructure: ${infraName}`);
+}
+
+// ******************** Open Storage Tab and Model ********************/
+async function openStorageModelOptions(page, tabName, modelName) {
+  await page.click(`text=${tabName}`);
+  await page.waitForSelector(`text=${modelName}`, { timeout: 10000 });
+
+  const row = page.locator(`xpath=//tbody//mobius-tr[.//text()[contains(., "${modelName}")]]`);
+  await row.waitFor({ state: 'visible', timeout: 10000 });
+
+  const moreOptionsBtn = row.locator(`img.cursor-pointer`);
+  await moreOptionsBtn.first().click();
+  console.log(`✅ Clicked 3-dot options button for model "${modelName}"`);
+
+  const editButton = row.locator(`mobius-div:has-text("Edit Storage")`).filter({
+    hasNot: page.locator('[class*="cursor-not-allowed"]'),
+  });
+
+  await editButton.first().waitFor({ state: 'visible', timeout: 10000 });
+  await editButton.first().click();
+  console.log(`✅ Clicked "Edit Storage" button for model "${modelName}"`);
+}
+
+// ******************** Generic Edit Storage Form Handler ********************/
+async function editStorageForm(page, formJson) {
+  const fields = formJson.fields || {};
+  const buttonText = formJson.buttonText || "Update";
+  const expectedToast = formJson.expectedToast || "Storage is updated Successfully";
+  const matchIndex = formJson.matchIndex || 1;
+
+  for (const [label, config] of Object.entries(fields)) {
+    const value = config.value;
+    const type = config.type || 'input';
+
+    try {
+      console.log(`👉 Processing field: ${label}, type: ${type}`);
+
+      if (type === 'dropdown') {
+        // Find dropdown label and its nearest dropdown container
+        const labelLocator = page.locator(`xpath=//label[contains(text(), "${label}")]`);
+        await labelLocator.waitFor({ state: 'visible', timeout: 10000 });
+
+        const dropdown = labelLocator.locator(`xpath=following::mobius-dropdown-input-container[@id='dropdown-input-container'][1]`);
+        await dropdown.waitFor({ state: 'visible', timeout: 10000 });
+        await dropdown.click();
+
+        const option = page.locator(`xpath=//mobius-listbox-option[normalize-space(.)="${value}"]`);
+        await option.waitFor({ state: 'visible', timeout: 10000 });
+        await option.click();
+
+        console.log(`✅ Selected "${value}" in dropdown "${label}"`);
+        continue;
+      }
+
+      if (type === 'input') {
+        const input = page.locator(`xpath=(//*[text()='${label}']//following::input)[1]`);
+        await input.waitFor({ state: 'visible', timeout: 10000 });
+
+        const existingValue = await input.inputValue();
+        if (!existingValue?.trim()) {
+          await input.fill(value.toString());
+          console.log(`📝 Filled "${label}" with "${value}"`);
+        } else {
+          console.log(`⏭️ Skipped "${label}", already has value: "${existingValue}"`);
+        }
+        continue;
+      }
+
+      console.warn(`⚠️ Unsupported field type "${type}" for "${label}"`);
+    } catch (err) {
+      console.error(`❌ Error in field "${label}": ${err.message}`);
+    }
+  }
+
+  // 🔽 Scroll down and submit
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(500);
+
+  const submitBtn = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
+  await submitBtn.waitFor({ state: 'visible', timeout: 10000 });
+  await submitBtn.click();
+  console.log(`🚀 Clicked "${buttonText}" button`);
+
+  // ✅ Verify toast
+  const toastLocator = page.locator(`text=${expectedToast}`);
+  await toastLocator.waitFor({ state: 'visible', timeout: 5000 });
+  console.log(`✅ Toast appeared: "${expectedToast}"`);
+}
+
+
 module.exports = {
   handleGenericForm,
   switchToTabOrModule,
@@ -470,5 +578,10 @@ module.exports = {
   openTriggerIfPresent,
   expandSection,
   collapseSection,
-  isSectionExpanded
-}
+  isSectionExpanded,
+  goToInfraSection,
+  openStorageModelOptions,
+  editStorageForm
+};
+
+

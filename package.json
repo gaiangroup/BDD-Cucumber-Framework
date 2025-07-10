@@ -1,11 +1,12 @@
 {
   "name": "cucumber_bdd_pwframework",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "clean": "rimraf reports/*",
-    "test": "npx cucumber-js features/tooltip.feature --format json:reports/tooltip-report.json",
-    "report": "node generate-report.js reports/tooltip-report.json reports/html/tooltip"
+    "test": "npx cucumber-js features/editStorage.feature --format json:reports/editStorage-report.json",
+    "report": "node generate-report.js reports/editStorage-report.json reports/html/editStorage-report.html"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "rimraf": "^6.0.1"
   },
   "dependencies": {
+    "cucumber-html-reporter": "^7.2.0",
     "imap": "^0.8.17",
     "mailparser": "^3.7.4"
   },
@@ -32,6 +34,5 @@
   "bugs": {
     "url": "https://github.com/Sushma-99957/BDD-Cucumber-Framework/issues"
   },
-  "homepage": "https://github.com/Sushma-99957/BDD-Cucumber-Framework#readme",
-  "description": ""
+  "homepage": "https://github.com/Sushma-99957/BDD-Cucumber-Framework#readme"
 }
