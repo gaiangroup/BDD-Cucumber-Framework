@@ -5,12 +5,7 @@ const multipleReport = require('multiple-cucumber-html-reporter');
 const singleReport = require('cucumber-html-reporter');
 
 // *************** CONFIGURATION *****************
-<<<<<<< HEAD
-
 const defaultTag = '@table_validations';
-=======
-const defaultTag = '@userInvitation';
->>>>>>> 9f5ac90b442eed119f108088b3499097441c1723
 const defaultFeatureDir = 'features';
 
 // ========== TIMESTAMP SETUP ==========

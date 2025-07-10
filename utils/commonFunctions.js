@@ -403,7 +403,7 @@ export async function switchToTabOrModule(page, config) {
  */
 export async function validateTableHeadersByColumnNames(page, expectedColumns) {
   for (const columnName of expectedColumns) {
-    const xpath = `(//*[contains(text(),'${columnName}')])[1]`;
+    const xpath = `(//table//following::*[text()='${columnName}'])[1]`;
    // console.log(`************** ${xpath}`);
 
     const columnLocator = page.locator(`xpath=${xpath}`);
@@ -650,9 +650,6 @@ export async function sendAndValidateInvites(page, config) {
   await sendBtn.waitFor({ state: "visible", timeout: 10000 });
   await sendBtn.click();
   console.log("✅ Clicked send button");
-
-
-
 
   // Step 3: Wait for success modal
   const modal = page.locator(`xpath=(//*[@*="${successModal}"])[1]`);

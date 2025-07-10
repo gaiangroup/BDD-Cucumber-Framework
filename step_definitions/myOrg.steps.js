@@ -122,15 +122,19 @@ Then(
   'User clicks on {string} tab and verifies the following table headers:',
   { timeout: 50000 },
   async function (tabName, dataTable) {
-    const tabIndex = myOrg_json.tabs.findIndex(tab => tab.label === tabName || tab.name === tabName);
-
+    const tabIndex = myOrg_json.tabs.findIndex(
+      tab => tab.label === tabName || tab.name === tabName
+    );
     if (tabIndex === -1) {
       throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
     }
 
     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
 
-    const columnNames = dataTable.raw().flat();
+    // 👇 DROP the first “column title” row, and collect only real headers
+    const rows = dataTable.raw();
+    const columnNames = rows.slice(1).flat();
+
     await validateTableHeadersByColumnNames(this.page, columnNames);
   }
 );

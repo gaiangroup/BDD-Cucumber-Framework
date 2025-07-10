@@ -1,0 +1,452 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "validate-table-headers;validate-roles-&-privileges-table",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "Validate Roles & Privileges table",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 303488414
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 349777712
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1412889987
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8631131132
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 7,
+            "name": "User switches to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 138707558
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 8,
+            "name": "User allows location access",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3522065485
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Header Column Names"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Role Type"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Description"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Role"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Custom Roles"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 9,
+            "name": "User clicks on \"Roles & Privileges\" tab and verifies the following table headers:",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:121"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 546473613
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 92368446
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 59838879
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@table_validations",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "validate-table-headers;validate-users-table",
+        "keyword": "Scenario",
+        "line": 19,
+        "name": "Validate Users table",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 290885975
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 336114341
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 20,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1405163496
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 21,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3499986809
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 22,
+            "name": "User switches to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 116745222
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 23,
+            "name": "User allows location access",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3524040112
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Header Column Names"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Name"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Role"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Designation"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Email"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Phone Number"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 24,
+            "name": "User clicks on \"Users\" tab and verifies the following table headers:",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:121"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1720393771
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 81410250
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 51192284
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@table_validations",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "validate-table-headers;validate-teams-table",
+        "keyword": "Scenario",
+        "line": 32,
+        "name": "Validate Teams table",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 294059087
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 303093226
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 33,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1325345870
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 34,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3674563682
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 35,
+            "name": "User switches to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 120489852
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 36,
+            "name": "User allows location access",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3526900845
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Header Column Names"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Team Name"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Description"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Members"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Tags"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 37,
+            "name": "User clicks on \"Teams\" tab and verifies the following table headers:",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:121"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 647284734
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 106134868
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 65325573
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@table_validations",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "validate-table-headers",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Validate Table Headers",
+    "tags": [
+      {
+        "name": "@table_validations",
+        "line": 1
+      }
+    ],
+    "uri": "features/tableValidations.feature"
+  }
+]

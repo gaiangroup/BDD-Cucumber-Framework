@@ -7,6 +7,7 @@ Feature: Validate Table Headers
     Then User switches to My Organization tab
     Then User allows location access
     Then User clicks on "Roles & Privileges" tab and verifies the following table headers:
+   | Header Column Names| 
       | Role Type     |
       | Description   |
       | Role          |
@@ -20,23 +21,22 @@ Feature: Validate Table Headers
     When User login with valid credentials and successful login
     Then User switches to My Organization tab
     Then User allows location access
-
     Then User clicks on "Users" tab and verifies the following table headers:
+   | Header Column Names| 
       | Name          |
       | Role          |
       | Designation   |
       | Email         |
       | Phone Number  |
 
-# @roles
-#   Scenario: Validate Teams table
-#     Given User navigate to the login page
-#     When User login with valid credentials and successful login
-#     Then User switches to My Organization tab
-#     Then User allows location access
-
-#     Then User clicks on "Teams" tab and verifies the following table headers:
-#       | Team Name     |
-#       | Description   |
-#       | Tags          |
-#       | Members       |
+  Scenario: Validate Teams table
+    Given User navigate to the login page
+    When User login with valid credentials and successful login
+    Then User switches to My Organization tab
+    Then User allows location access
+    Then User clicks on "Teams" tab and verifies the following table headers:
+   | Header Column Names| 
+      | Team Name     |
+      | Description   |
+      | Members       |
+      | Tags          |
