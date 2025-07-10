@@ -1,0 +1,109 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "validations-of-login-functionality;verify-login-functionality-with-invalid-credentials",
+        "keyword": "Scenario",
+        "line": 13,
+        "name": "Verify login functionality with invalid credentials",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 604477969
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 731723743
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 14,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2953650932
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 15,
+            "name": "User attempts login with an invalid email and invalid password,and verifies the error",
+            "match": {
+              "location": "step_definitions/login.steps.js:36"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1167317353
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 16,
+            "name": "User attempts login with a valid email and an invalid password,and verifies the error",
+            "match": {
+              "location": "step_definitions/login.steps.js:40"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1635715933
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 166683798
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 153495560
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@login",
+            "line": 1
+          },
+          {
+            "name": "@NegativeScenario",
+            "line": 12
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "validations-of-login-functionality",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Validations of Login functionality",
+    "tags": [
+      {
+        "name": "@login",
+        "line": 1
+      }
+    ],
+    "uri": "features/login.feature"
+  }
+]
