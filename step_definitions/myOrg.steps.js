@@ -1,7 +1,9 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule,scrollContainerById, clickButton,threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites, validateTableHeadersByColumnNames } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule,scrollContainerById, clickButton,threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
+const tableData = require('../testData/tableData.json');
+
 const fs = require('fs');
 const path = require('path');
 
@@ -99,45 +101,51 @@ Then('User should send the invitation and validate the subject', { timeout: 120 
 //   'User clicks on {string} tab and verifies the following table headers:',
 //   { timeout: 50000 },
 //   async function (tabName, dataTable) {
-//     const tabIndexMap = {
-//     // 'Roles & Privileges': 1,
-//      //'Teams': 2,
-//       'Users': 3,  
-//     };
-
-//     const tabIndex = tabIndexMap[tabName];
-//     if (tabIndex === undefined) {
-//       throw new Error(`Tab "${tabName}" is not mapped. Please update tabIndexMap.`);
+//     const tabIndex = myOrg_json.tabs.findIndex(
+//       tab => tab.label === tabName || tab.name === tabName
+//     );
+//     if (tabIndex === -1) {
+//       throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
 //     }
 
 //     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
 
-//     const columnNames = dataTable.raw().flat();
-//     await validateTableHeadersByColumnNames(this.page, columnNames);
+//     // 👇 DROP the first “column title” row, and collect only real headers
+//     const rows = dataTable.raw();
+//     const columnNames = rows.slice(1).flat();
+
+//     await validateTableHeadersAndRows(this.page, columnNames);
 //   }
 // );
 
 
 Then(
-  'User clicks on {string} tab and verifies the following table headers:',
-  { timeout: 50000 },
-  async function (tabName, dataTable) {
+  'User clicks on {string} tab and validates the table',
+  { timeout: 60000 },
+  async function (tabName) {
     const tabIndex = myOrg_json.tabs.findIndex(
       tab => tab.label === tabName || tab.name === tabName
     );
+
     if (tabIndex === -1) {
       throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
     }
 
     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
 
-    // 👇 DROP the first “column title” row, and collect only real headers
-    const rows = dataTable.raw();
-    const columnNames = rows.slice(1).flat();
+    // ✅ Use tableData, which is correctly imported above
+    const tableInfo = tableData[tabName];
 
-    await validateTableHeadersByColumnNames(this.page, columnNames);
+    if (!tableInfo) {
+      throw new Error(`No test data found for table: "${tabName}"`);
+    }
+
+    await validateTableHeadersAndRow(this.page, tableInfo.expectedHeaders, tableInfo.expectedRow);
   }
 );
+
+
+
 
 When('User performing scroll action to the bottom', { timeout: 20000 }, async function () {
     await waitUntilPageIsReady(this.page);

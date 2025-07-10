@@ -204,45 +204,123 @@ export async function switchToTabOrModule(page, config) {
   }
 }
 
-//***********************Generic Table Validation ****************************************************
+
+
+// /**
+//  * Validates that each expected column name is visible using your custom XPath strategy.
+//  *
+//  * @param {import('@playwright/test').Page} page - Playwright page object
+//  * @param {string[]} expectedColumns - List of expected header names
+//  */
 // export async function validateTableHeadersByColumnNames(page, expectedColumns) {
 //   for (const columnName of expectedColumns) {
-//     const xpath = `(//*[contains(text(),'${columnName}')])[1]`;
-//     console.log(`**************`+xpath)
+//     const xpath = `(//table//following::*[text()='${columnName}'])[1]`;
+//    // console.log(`************** ${xpath}`);
 
 //     const columnLocator = page.locator(`xpath=${xpath}`);
-//     await expect(columnLocator).toBeVisible({
-//       timeout: 70000,
-//     });
-//     console.log(`✅ Visible: ${columnName}`);
+
+//     try {
+//       await columnLocator.waitFor({ state: 'visible', timeout: 10000 });
+//       await expect(columnLocator).toBeVisible({
+//         timeout: 10000,
+//       });
+//       console.log(`✅ Visible: ${columnName}`);
+//     } catch (error) {
+//       console.error(`❌ Not visible: ${columnName} — Might be hidden or delayed in rendering.`);
+//       throw error;
+//     }
 //   }
 // }
 
-/**
- * Validates that each expected column name is visible using your custom XPath strategy.
- *
- * @param {import('@playwright/test').Page} page - Playwright page object
- * @param {string[]} expectedColumns - List of expected header names
- */
-export async function validateTableHeadersByColumnNames(page, expectedColumns) {
-  for (const columnName of expectedColumns) {
-    const xpath = `(//table//following::*[text()='${columnName}'])[1]`;
-   // console.log(`************** ${xpath}`);
+// /**
+//  * Validates headers and row data for a table.
+//  * @param {import('@playwright/test').Page} page
+//  * @param {string[]} expectedHeaders
+//  * @param {string[]} expectedRow
+//  */
+// export async function validateTableHeadersAndRow(page, expectedHeaders, expectedRow) {
+//   console.log(`🔍 Validating Headers...`);
+//   for (const header of expectedHeaders) {
+//     const xpath = `(//table//*[normalize-space(text())='${header}'])[1]`;
+//     const locator = page.locator(`xpath=${xpath}`);
 
-    const columnLocator = page.locator(`xpath=${xpath}`);
+//     try {
+//       await locator.waitFor({ state: 'visible', timeout: 10000 });
+//       await expect(locator).toBeVisible();
+//       console.log(`✅ Visible Header: ${header}`);
+//     } catch (error) {
+//       console.error(`❌ Header not visible: ${header}`);
+//       throw error;
+//     }
+//   }
+
+//   console.log(`🔍 Validating Row Data...`);
+
+//   const rowLocator = page.locator('//table//tbody//mobius-tr');
+//   await expect(rowLocator.first()).toBeVisible({ timeout: 10000 });
+
+//   const rowCount = await rowLocator.count();
+
+//   if (rowCount === 0) {
+//     throw new Error('❌ No table rows found');
+//   }
+
+//   const firstRow = rowLocator.nth(0); // first actual row
+//   const cellLocators = firstRow.locator('td');
+//   const cellCount = await cellLocators.count();
+
+//   for (let i = 0; i < expectedRow.length; i++) {
+//     const cell = cellLocators.nth(i);
+//     const cellText = await cell.innerText();
+
+//     try {
+//       expect(cellText.trim()).toContain(expectedRow[i]);
+//       console.log(`✅ Cell[${i}] matches: ${expectedRow[i]}`);
+//     } catch (err) {
+//       console.error(`❌ Mismatch at cell ${i}: Expected "${expectedRow[i]}", Found "${cellText.trim()}"`);
+//       throw err;
+//     }
+//   }
+// }
+
+// commonFunctions.js
+
+/**
+ * Validates headers and checks that at least one row is present in the table.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} expectedHeaders
+ */
+export async function validateTableHeadersAndRow(page, expectedHeaders) {
+  console.log(`🔍 Validating Headers...`);
+
+  for (const header of expectedHeaders) {
+    const xpath = `(//table//*[normalize-space(text())='${header}'])[1]`;
+    const locator = page.locator(`xpath=${xpath}`);
 
     try {
-      await columnLocator.waitFor({ state: 'visible', timeout: 10000 });
-      await expect(columnLocator).toBeVisible({
-        timeout: 10000,
-      });
-      console.log(`✅ Visible: ${columnName}`);
+      await locator.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(locator).toBeVisible();
+      console.log(`✅ Visible Header: ${header}`);
     } catch (error) {
-      console.error(`❌ Not visible: ${columnName} — Might be hidden or delayed in rendering.`);
+      console.error(`❌ Header not visible: ${header}`);
       throw error;
     }
   }
+
+  console.log(`🔍 Validating Row Presence...`);
+
+  const rowLocator = page.locator('//table//tbody//mobius-tr');
+  const rowCount = await rowLocator.count();
+
+  if (rowCount === 0) {
+    throw new Error('❌ No table rows found');
+  }
+
+  console.log(`✅ Found ${rowCount} row(s) in the table`);
 }
+
+
+
 
 //************************Click Button Function************************
 export async function clickButton(page, buttonConfig) {
