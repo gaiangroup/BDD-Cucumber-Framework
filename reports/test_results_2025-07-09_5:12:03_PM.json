@@ -1,0 +1,161 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "my-organization-module-validations;verify-user-invitation-and-subject-validation",
+        "keyword": "Scenario",
+        "line": 24,
+        "name": "Verify User Invitation and Subject Validation",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 649267396
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 661929793
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 25,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3478569284
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 26,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 10412706525
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 27,
+            "name": "User switches to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 395779536
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 28,
+            "name": "User clicks on Users tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:79"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 659388704
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 29,
+            "name": "User allows location access",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3551892825
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 30,
+            "name": "User clicks on Invite Users button",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:84"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 125270153
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 31,
+            "name": "User should send the invitation and validate the subject",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:91"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 19236601380
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 144990245
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 150091988
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@org_validations",
+            "line": 1
+          },
+          {
+            "name": "@userInvitation",
+            "line": 23
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "my-organization-module-validations",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "My Organization module validations",
+    "tags": [
+      {
+        "name": "@org_validations",
+        "line": 1
+      }
+    ],
+    "uri": "features/MyOrg.feature"
+  }
+]

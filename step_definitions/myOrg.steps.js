@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, clickButton, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites,validateTableHeadersByColumnNames } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule,scrollContainerById, clickButton,threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites, validateTableHeadersByColumnNames } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const fs = require('fs');
 const path = require('path');
@@ -19,8 +19,8 @@ After(async function (scenario) {
             const screenshot = await this.page.screenshot({ path: filePath, fullPage: true });
             await this.attach(fs.readFileSync(filePath), 'image/png');
 
-            console.log(`📸 Screenshot captured for failed scenario: ${scenario.pickle.name}`);
-            console.log(`🔹 Error in: ${scenario.pickle.uri} at step: ${scenario.pickle.steps.map(s => s.text).join(' -> ')}`);
+            console.log(`Screenshot captured for failed scenario: ${scenario.pickle.name}`);
+            console.log(`Error in: ${scenario.pickle.uri} at step: ${scenario.pickle.steps.map(s => s.text).join(' -> ')}`);
         }
     }
     if (this.browser) {
@@ -88,7 +88,7 @@ When('User clicks on Invite Users button', { timeout: 20000 }, async function ()
     console.log("Invite Users button clicked. Waiting for form to appear...");
 });
 
-Then('User should send the invitation and validate the subject', { timeout: 20000 }, async function () {
+Then('User should send the invitation and validate the subject', { timeout: 120 * 1000 }, async function () {
     await this.page.reload();
     await waitUntilPageIsReady(this.page);
     const result = await sendAndValidateInvites(this.page, myOrg_json);
@@ -138,4 +138,31 @@ Then(
     await validateTableHeadersByColumnNames(this.page, columnNames);
   }
 );
+
+When('User performing scroll action to the bottom', { timeout: 20000 }, async function () {
+    await waitUntilPageIsReady(this.page);
+    await scrollContainerById(this.page, myOrg_json.scrollContainer);
+});
+
+//********************Delete Role******************/
+When('User clicks on three dot action menu to delete Role', { timeout: 20000 }, async function () {
+    await waitUntilPageIsReady(this.page);
+    await threeDotActionMenu(this.page, myOrg_json.menuAction_Role);
+});
+
+Then('User should see able to delete the role successfully', { timeout: 20000 }, async function () {
+    await waitUntilPageIsReady(this.page);
+    await handlePopupSimple(this.page, myOrg_json.deleteItem);
+});
+
+//********************Delete Team******************/
+When('User clicks on three dot action menu to delete Team', { timeout: 20000 }, async function () {
+    await waitUntilPageIsReady(this.page);
+    await threeDotActionMenu(this.page, myOrg_json.menuAction_Team);
+});
+
+Then('User should see able to delete the Team successfully', { timeout: 20000 }, async function () {
+    await waitUntilPageIsReady(this.page);
+    await handlePopupSimple(this.page, myOrg_json.deleteItem);
+});
 
