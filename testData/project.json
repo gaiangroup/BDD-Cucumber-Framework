@@ -1,0 +1,137 @@
+{
+    "tabs": [
+        {
+            "name": "Projects"
+        }
+    ],
+    "button": [
+        {
+            "label": "Add Projects"
+        }
+    ],
+    "projectForm_stepper1": {
+        "buttonText": "Next",
+        "matchIndex": 1,
+        "fields": {
+            "Name *": {
+                "value": "Automation Project"
+            },
+            "Description *": {
+                "value": "Testing dynamic form in projects"
+            },
+            "Environment *": {
+                "value": "test"
+            },
+            "Tags *": {
+                "type": "tag",
+                "value": [
+                    "test1",
+                    "test2"
+                ]
+            }
+        }
+    },
+    "projectForm_stepper2": {
+        "buttonText": "Next",
+        "matchIndex": 2,
+        "requiredError": "Please fill out all mandatory fields.",
+        "fields": {
+            "Infrastructure *": {
+                "type": "dropdown",
+                "value": [
+                    "test"
+                ]
+            },
+            "Region *": {
+                "type": "dropdown",
+                "value": [
+                    "INDIA"
+                ]
+            },
+            "Select DevSecOps Actions": {
+                "value": [
+                    {
+                        "text": "Kubernetes Cluster *",
+                        "matchIndex": 1
+                    },
+                    {
+                        "text": "Security Compliance",
+                        "matchIndex": 1
+                    },
+                    {
+                        "text": "IAC Deployment *",
+                        "matchIndex": 1
+                    }
+                ]
+            },
+            "Budget *": {
+                "value": "10000"
+            }
+        }
+    },
+    "projectForm_stepper3": {
+        "buttonText": "Next",
+        "matchIndex": 3,
+        "fields": {
+            "Start Time *": {
+                "type": "dateselection",
+                "value": {
+                    "id": "start-time",
+                    "day": "28",
+                    "index": 1
+                }
+            },
+            "Release Notes *": {
+                "value": "Testing dynamic form in projects"
+            },
+            "End Time *": {
+                "type": "dateselection",
+                "value": {
+                    "id": "end-time",
+                    "day": "30",
+                    "index": 2
+                }
+            }
+        }
+    },
+    "projectForm_stepper4": {
+        "buttonText": "Next",
+        "matchIndex": 4,
+        "requiredError": "Please fill all fields before submitting.",
+        "fields": {
+            "CPU Multiplier (cost of 1 core cpu) *": {
+                "value": "1"
+            },
+            "RAM Multiplier (cost of 1 GB memory) *": {
+                "value": "1"
+            },
+            "Storage Multiplier (cost of 1GB storage) *": {
+                "value": "1"
+            }
+        }
+    },
+    "projectForm_stepper5": {
+        "buttonText": "Save",
+        "matchIndex": 1,
+        "requiredError": "Please provide team",
+        "expectedToast": "Project is created successfully!",
+        "fields": {
+            "Team *": {
+                "type": "dropdown",
+                "value": [
+                    "testteam_aut"
+                ]
+            }
+        }
+    },
+    "menuAction_Project": {
+        "matchIndex": 1,
+        "actionText": "Delete Project",
+        "id": "dropdown-input-container"
+    },
+    "deleteProjectItem": {
+        "expectedText": "Are you sure you want to Delete?",
+        "buttonText": "Delete",
+        "matchingIndex": 1
+    }
+}

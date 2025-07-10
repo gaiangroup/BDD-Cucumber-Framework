@@ -1,0 +1,131 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "project-creation-flow;login-and-create-project",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Login and create project",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 636158126
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 685822672
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:21"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2864116230
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6487727662
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 9,
+            "name": "User should switch to projects tab",
+            "match": {
+              "location": "step_definitions/project.steps.js:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 244319743
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 10,
+            "name": "User clicks Add Project button",
+            "match": {
+              "location": "step_definitions/project.steps.js:17"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6092784577
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "User should fill all the required details to create project",
+            "match": {
+              "location": "step_definitions/project.steps.js:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 11488356133
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 164646485
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 183225296
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@project",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "project-creation-flow",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "project creation flow",
+    "tags": [
+      {
+        "name": "@project",
+        "line": 1
+      }
+    ],
+    "uri": "features/project.feature"
+  }
+]

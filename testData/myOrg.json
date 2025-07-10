@@ -75,6 +75,9 @@
         },
         {
             "label": "Invite Users"
+        },
+        {
+            "label": "Procced to Next Step"
         }
     ],
     "keyboardAction": [
@@ -91,7 +94,7 @@
         "expectedToast": "Team is created successfully!",
         "fields": {
             "Team *": {
-                "value": "Test Automation"
+                "value": "Test Automation_jul10"
             },
             "Describe what the team does *": {
                 "value": "This team is responsible for automation testing"
@@ -136,11 +139,13 @@
     },
     "menuAction_Role": {
         "matchIndex": 1,
-        "actionText": "Delete Role"
+        "actionText": "Delete Role",
+        "id": "sticky right"
     },
     "menuAction_Team": {
         "matchIndex": 1,
-        "actionText": "Delete Team"
+        "actionText": "Remove Team",
+        "id": "sticky right"
     },
     "scrollContainer": {
         "id": "organization-main-container",

@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule,scrollContainerById, clickButton,threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const tableData = require('../testData/tableData.json');
 
@@ -63,11 +63,13 @@ Then('User should see the role creation form and fill in the details', { timeout
 
 // ********************Team Creation Steps*****************************************
 When('User clicks on Teams tab', { timeout: 20000 }, async function () {
+    await this.page.reload();
     await waitUntilPageIsReady(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[2]);
 });
 
 When('User clicks on Add Team button', { timeout: 20000 }, async function () {
+    await this.page.reload();
     await this.page.waitForTimeout(2000);
     await clickButton(this.page, myOrg_json.button[2]);
 });
@@ -79,70 +81,60 @@ Then('User should see the Team creation form and fill in the details', { timeout
 
 //********************User Invitation******************/
 When('User clicks on Users tab', { timeout: 20000 }, async function () {
+    await this.page.reload();
     await waitUntilPageIsReady(this.page);
+
     await switchToTabOrModule(this.page, myOrg_json.tabs[3]);
 });
 
-When('User clicks on Invite Users button', { timeout: 20000 }, async function () {
-    //await this.page.reload();
+When('User clicks on Invite Users button', { timeout: 120 * 1000 }, async function () {
+    await this.page.reload();
     await waitUntilPageIsReady(this.page);
     await clickButton(this.page, myOrg_json.button[3]);
     console.log("Invite Users button clicked. Waiting for form to appear...");
 });
 
 Then('User should send the invitation and validate the subject', { timeout: 120 * 1000 }, async function () {
-    await this.page.reload();
+
     await waitUntilPageIsReady(this.page);
     const result = await sendAndValidateInvites(this.page, myOrg_json);
     console.log(result);
 });
 
-// Then(
-//   'User clicks on {string} tab and verifies the following table headers:',
-//   { timeout: 50000 },
-//   async function (tabName, dataTable) {
-//     const tabIndex = myOrg_json.tabs.findIndex(
-//       tab => tab.label === tabName || tab.name === tabName
-//     );
-//     if (tabIndex === -1) {
-//       throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
-//     }
+Then('User should click on the invite popup', { timeout: 120 * 1000 }, async function () {
 
-//     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
-
-//     // 👇 DROP the first “column title” row, and collect only real headers
-//     const rows = dataTable.raw();
-//     const columnNames = rows.slice(1).flat();
-
-//     await validateTableHeadersAndRows(this.page, columnNames);
-//   }
-// );
+    await waitUntilPageIsReady(this.page);
+    const result1 = await clickButton(this.page, myOrg_json.button[4]);
+    console.log(result1);
+});
 
 
 Then(
-  'User clicks on {string} tab and validates the table',
-  { timeout: 60000 },
-  async function (tabName) {
-    const tabIndex = myOrg_json.tabs.findIndex(
-      tab => tab.label === tabName || tab.name === tabName
-    );
+    'User clicks on {string} tab and validates the table',
+    { timeout: 60000 },
+    async function (tabName) {
+        await this.page.reload();
+        const tabIndex = myOrg_json.tabs.findIndex(
+            tab => tab.label === tabName || tab.name === tabName
+        );
 
-    if (tabIndex === -1) {
-      throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
+        if (tabIndex === -1) {
+            throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
+        }
+
+        await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
+
+        // ✅ Use tableData, which is correctly imported above
+        const tableInfo = tableData[tabName];
+
+        if (!tableInfo) {
+            throw new Error(`No test data found for table: "${tabName}"`);
+        }
+
+        await validateTableHeadersAndRow(this.page, tableInfo.expectedHeaders, tableInfo.expectedRow);
     }
-
-    await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
-
-    // ✅ Use tableData, which is correctly imported above
-    const tableInfo = tableData[tabName];
-
-    if (!tableInfo) {
-      throw new Error(`No test data found for table: "${tabName}"`);
-    }
-
-    await validateTableHeadersAndRow(this.page, tableInfo.expectedHeaders, tableInfo.expectedRow);
-  }
 );
+
 
 
 
@@ -173,4 +165,5 @@ Then('User should see able to delete the Team successfully', { timeout: 20000 },
     await waitUntilPageIsReady(this.page);
     await handlePopupSimple(this.page, myOrg_json.deleteItem);
 });
+
 

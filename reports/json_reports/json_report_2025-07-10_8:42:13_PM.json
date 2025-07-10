@@ -1,0 +1,430 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "testing-user-flow-of-runrun;login-and-perform-crud-operations-as-a-user",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Login and perform CRUD operations as a user",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 609932740
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 686190643
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:21"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3127814096
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5245063200
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 10,
+            "name": "User should see the Dashboard as home page",
+            "match": {
+              "location": "step_definitions/login.steps.js:47"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1403817
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 11,
+            "name": "User switches to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 332079707
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 12,
+            "name": "User allows location access",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:43"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3560223458
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 13,
+            "name": "User clicks on Role tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:38"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 74466977
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 14,
+            "name": "User clicks on New Role button",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2076513937
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 15,
+            "name": "User should see the role creation form and fill in the details",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8933883638
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 16,
+            "name": "User performing scroll action to the bottom",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:141"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 142703052
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 17,
+            "name": "User clicks on three dot action menu to delete Role",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:147"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 630996717
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 18,
+            "name": "User should see able to delete the role successfully",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:152"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 65591165
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 19,
+            "name": "User clicks on \"Roles & Privileges\" tab and validates the table",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:112"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 203182441
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 20,
+            "name": "User clicks on \"Users\" tab and validates the table",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:112"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1262978509
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 21,
+            "name": "User clicks on \"Teams\" tab and validates the table",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:112"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 450630162
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 22,
+            "name": "User clicks on Add Team button",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:71"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2788784865
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 23,
+            "name": "User should see the Team creation form and fill in the details",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:77"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6634005848
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 24,
+            "name": "User performing scroll action to the bottom",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:141"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7506703
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 25,
+            "name": "User clicks on three dot action menu to delete Team",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:158"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 192443477
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 26,
+            "name": "User should see able to delete the Team successfully",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:163"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 173448191
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 27,
+            "name": "User clicks on Users tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:83"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7172842843
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 28,
+            "name": "User clicks on Invite Users button",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:90"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3341617695
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 29,
+            "name": "User should send the invitation and validate the subject",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:97"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 11930059626
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 30,
+            "name": "User should click on the invite popup",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:104"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 70967141
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 31,
+            "name": "User clicks on \"My Infra\" tab and validates the table infra",
+            "match": {
+              "location": "step_definitions/infrastructure.steps.js:9"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2397150656
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 32,
+            "name": "User clicks on \"Customers\" tab and validates the table Customers",
+            "match": {
+              "location": "step_definitions/customer.steps.js:9"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2722035439
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 33,
+            "name": "User should switch to projects tab",
+            "match": {
+              "location": "step_definitions/project.steps.js:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2623165219
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 34,
+            "name": "User clicks Add Project button",
+            "match": {
+              "location": "step_definitions/project.steps.js:17"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5810895290
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 35,
+            "name": "User should fill all the required details to create project",
+            "match": {
+              "location": "step_definitions/project.steps.js:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7029454042
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 162495854
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 161657137
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@suite_1",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "testing-user-flow-of-runrun",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Testing User flow of RUNRUN",
+    "tags": [
+      {
+        "name": "@suite_1",
+        "line": 1
+      }
+    ],
+    "uri": "features/testSuite1.feature"
+  }
+]
