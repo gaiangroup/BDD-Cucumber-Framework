@@ -1,18 +1,20 @@
-const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
+const { Given, When, Then, BeforeAll, AfterAll } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
 const { expect } = require('chai');
 const { handleGenericForm, waitUntilPageIsReady, handleAssertions } = require('../utils/commonFunctions');
 const login_testData = require('../testData/login.json');
+const { BeforeAll } = require('cucumber-js');
+const { AfterAll } = require('cucumber-js');
 
 let browser;
 
-Before(async function () {
+BeforeAll(async function () {
     browser = await chromium.launch({ headless: false });
     const context = await browser.newContext();
     this.page = await context.newPage();
 });
 
-After(async function () {
+AfterAll(async function () {
     await browser.close();
 });
 

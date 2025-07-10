@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node runner.js"
+    "test": "node runner.js",
+    "postinstall": "npx playwright install"
+    
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,7 @@
     "@cucumber/cucumber": "^11.3.0",
     "@playwright/test": "^1.53.2",
     "allure-commandline": "^2.34.1",
+    "archiver": "^7.0.1",
     "chai": "^5.2.0",
     "cucumber-html-reporter": "^7.2.0",
     "cucumber-js": "npm:@cucumber/cucumber@^11.3.0",
