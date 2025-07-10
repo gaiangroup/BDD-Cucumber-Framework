@@ -1,0 +1,174 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "my-organization-module-validations;verify-delete-role",
+        "keyword": "Scenario",
+        "line": 15,
+        "name": "Verify Delete Role",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 621878457
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 663431529
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 16,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2571957275
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 17,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7370807681
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "User switches to My Organization tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:31"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 334656369
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "User allows location access",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3565362477
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 20,
+            "name": "User clicks on Role tab",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:36"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 144415868
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 21,
+            "name": "User performing scroll action to the bottom",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:120"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7196810
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 22,
+            "name": "User clicks on three dot action menu to delete Role",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:126"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 639917684
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 23,
+            "name": "User should see able to delete the role successfully",
+            "match": {
+              "location": "step_definitions/myOrg.steps.js:131"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 70150030
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 189400340
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 150761150
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@org_validations",
+            "line": 1
+          },
+          {
+            "name": "@deleteRole",
+            "line": 14
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "my-organization-module-validations",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "My Organization module validations",
+    "tags": [
+      {
+        "name": "@org_validations",
+        "line": 1
+      }
+    ],
+    "uri": "features/MyOrg.feature"
+  }
+]

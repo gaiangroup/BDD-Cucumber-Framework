@@ -14,6 +14,7 @@
     "allure-commandline": "^2.34.1",
     "chai": "^5.2.0",
     "cucumber-html-reporter": "^7.2.0",
+    "cucumber-js": "npm:@cucumber/cucumber@^11.3.0",
     "dotenv": "^17.0.1",
     "inline-source": "^8.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3",
@@ -23,6 +24,7 @@
   "dependencies": {
     "@playwright/test": "^1.53.2",
     "imap": "^0.8.19",
-    "mailparser": "^3.7.4"
+    "mailparser": "^3.7.4",
+    "pixelmatch": "^7.1.0"
   }
 }
