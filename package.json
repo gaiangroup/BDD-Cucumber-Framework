@@ -13,7 +13,6 @@
   "description": "",
   "devDependencies": {
     "@cucumber/cucumber": "^11.3.0",
-    "@playwright/test": "^1.53.2",
     "allure-commandline": "^2.34.1",
     "archiver": "^7.0.1",
     "chai": "^5.2.0",
@@ -22,12 +21,13 @@
     "dotenv": "^17.0.1",
     "inline-source": "^8.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3",
-    "playwright": "^1.53.1"
+    "playwright": "^1.53.1",
+    "@playwright/test": "^1.44.0"
   },
   "dependencies": {
+    "@playwright/test": "^1.53.2",
     "imap": "^0.8.19",
     "mailparser": "^3.7.4",
-    "pixelmatch": "^7.1.0",
-    "pngjs": "^7.0.0"
+    "pixelmatch": "^7.1.0"
   }
 }
