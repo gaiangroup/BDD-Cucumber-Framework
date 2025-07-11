@@ -167,6 +167,7 @@ export async function handleGenericForm(page, formJson) {
   await actionButton.waitFor({ state: 'visible', timeout: 10000 });
   await expect(actionButton).toBeEnabled();
   await actionButton.click();
+  await waitUntilpageload(page); // Ensure network is idle after click
   console.log(`Clicked action button: "${buttonText}"`);
 
   // 🔹 Toast validation
@@ -179,8 +180,8 @@ export async function handleGenericForm(page, formJson) {
 
 //************************Generic switchToTab()/Module Function************************
 export async function switchToTabOrModule(page, config) {
+  // await waitUntilpageload(page);
   let tabArray = [];
-
   // Accept either: [{name: 'tab'}] or {name: 'tab'}
   if (Array.isArray(config)) {
     tabArray = config.map(t => t.name);
@@ -285,9 +286,23 @@ export async function clickButton(page, buttonConfig) {
 }
 
 //*************************Wait Until Page is Ready************************
+
+
 export async function waitUntilPageIsReady(page) {
   await page.waitForLoadState('networkidle', { timeout: 50000 });
   await page.waitForLoadState('load', { timeout: 50000 });       // Waits for the full load event
+  await page.waitForLoadState('domcontentloaded', { timeout: 50000 }); // Waits until the DOM is parsed
+
+}
+export async function waitUntilpageload(page) {
+  await page.waitForLoadState('load', { timeout: 50000 });       // Waits for the full load event
+
+}
+export async function waitUntilpagenetworkidle(page) {
+  await page.waitForLoadState('networkidle', { timeout: 50000 });
+ 
+}
+export async function waitUntilpagedomcontentloaded(page) {
   await page.waitForLoadState('domcontentloaded', { timeout: 50000 }); // Waits until the DOM is parsed
 
 }
@@ -694,6 +709,8 @@ export async function handlePopupSimple(page, config) {
 export async function threeDotActionMenu(page, config) {
   const index = config?.matchIndex;
   const actionText = config?.actionText;
+  const id = config?.id;
+
 
   if (!actionText) {
     console.warn('No actionText provided in config.');

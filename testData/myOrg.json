@@ -94,7 +94,7 @@
         "expectedToast": "Team is created successfully!",
         "fields": {
             "Team *": {
-                "value": "Test Automation_jul10"
+                "value": "Test Automation Team 007"
             },
             "Describe what the team does *": {
                 "value": "This team is responsible for automation testing"
