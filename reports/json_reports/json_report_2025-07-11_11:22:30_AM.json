@@ -1,0 +1,159 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "project-creation-flow;login-and-create-and-delete-project",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Login and Create and Delete project",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 647112732
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 888363658
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "User navigate to the login page",
+            "match": {
+              "location": "step_definitions/login.steps.js:21"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7816168134
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "User login with valid credentials and successful login",
+            "match": {
+              "location": "step_definitions/login.steps.js:33"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 16081000367,
+              "error_message": "page.waitForLoadState: Target page, context or browser has been closed\n=========================== logs ===========================\n  \"commit\" event fired\n  \"domcontentloaded\" event fired\n  \"load\" event fired\n============================================================\n    at waitUntilPageIsReady (/home/gaian/Desktop/Cucumber_BDD_PWFramework/utils/commonFunctions.js:289:14)\n    at World.<anonymous> (/home/gaian/Desktop/Cucumber_BDD_PWFramework/step_definitions/login.steps.js:35:11)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 9,
+            "name": "User should switch to projects tab",
+            "match": {
+              "location": "step_definitions/project.steps.js:12"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 10,
+            "name": "User clicks Add Project button",
+            "match": {
+              "location": "step_definitions/project.steps.js:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "User should fill all the required details to create project",
+            "match": {
+              "location": "step_definitions/project.steps.js:24"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 12,
+            "name": "User should click on three dot menu and choose Delete action",
+            "match": {
+              "location": "step_definitions/project.steps.js:42"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 13,
+            "name": "User should see able to delete the Project successfully",
+            "match": {
+              "location": "step_definitions/project.steps.js:46"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "failed",
+              "duration": 4850001,
+              "error_message": "page.screenshot: Target page, context or browser has been closed\n    at World.<anonymous> (/home/gaian/Desktop/Cucumber_BDD_PWFramework/step_definitions/myOrg.steps.js:21:48)"
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 239210891
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@project",
+            "line": 1
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "project-creation-flow",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "project creation flow",
+    "tags": [
+      {
+        "name": "@project",
+        "line": 1
+      }
+    ],
+    "uri": "features/project.feature"
+  }
+]
