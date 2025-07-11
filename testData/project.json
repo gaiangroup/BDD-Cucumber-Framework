@@ -119,13 +119,13 @@
             "Team *": {
                 "type": "dropdown",
                 "value": [
-                    "testteam_aut"
+                    "Test Automation Team 007"
                 ]
             }
         }
     },
     "menuAction_Project": {
-        "matchIndex": 1,
+        "matchIndex": 2,
         "actionText": "Delete Project",
         "id": "dropdown-input-container"
     },

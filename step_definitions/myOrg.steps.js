@@ -1,6 +1,6 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple,waitUntilPageIsReady, waitUntilpagedomcontentloaded,waitUntilpagenetworkidle,waitUntilpageload, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const tableData = require('../testData/tableData.json');
 
@@ -31,7 +31,7 @@ After(async function (scenario) {
 });
 
 When('User switches to My Organization tab', { timeout: 20000 }, async function () {
-    await waitUntilPageIsReady(this.page);
+    await waitUntilpagedomcontentloaded(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[0]);
 });
 
@@ -113,25 +113,23 @@ Then(
     'User clicks on {string} tab and validates the table',
     { timeout: 60000 },
     async function (tabName) {
-        await this.page.reload();
         const tabIndex = myOrg_json.tabs.findIndex(
             tab => tab.label === tabName || tab.name === tabName
         );
-
         if (tabIndex === -1) {
             throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
         }
-
-        await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
-
+     await waitUntilpageload(this.page);
+     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
         // ✅ Use tableData, which is correctly imported above
         const tableInfo = tableData[tabName];
 
         if (!tableInfo) {
             throw new Error(`No test data found for table: "${tabName}"`);
         }
-
+         await waitUntilpagenetworkidle(this.page);
         await validateTableHeadersAndRow(this.page, tableInfo.expectedHeaders, tableInfo.expectedRow);
+        await waitUntilpageload(this.page);
     }
 );
 
