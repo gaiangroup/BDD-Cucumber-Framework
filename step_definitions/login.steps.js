@@ -1,21 +1,32 @@
-const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
+const { BeforeAll,AfterAll,Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
 const { expect } = require('chai');
 const { handleGenericForm, waitUntilPageIsReady, handleAssertions } = require('../utils/commonFunctions');
 const login_testData = require('../testData/login.json');
-const { BeforeAll } = require('cucumber-js');
-const { AfterAll } = require('cucumber-js');
+//const { BeforeAll } = require('cucumber-js');
+//const { AfterAll } = require('cucumber-js');
 
 let browser;
 
+BeforeAll(async function () {
+  browser = await chromium.launch({
+    headless: false,
+    args: ['--start-maximized'],
+  });
+});
+
 Before(async function () {
-    browser = await chromium.launch({ headless: false });
-    const context = await browser.newContext();
-    this.page = await context.newPage();
+  this.context = await browser.newContext({ viewport: null });
+  this.page = await this.context.newPage();
 });
 
 After(async function () {
-    await browser.close();
+  await this.page?.close();
+  await this.context?.close();
+});
+
+AfterAll(async function () {
+  await browser?.close();
 });
 
 Given('User navigate to the login page', { timeout: 20000 }, async function () {

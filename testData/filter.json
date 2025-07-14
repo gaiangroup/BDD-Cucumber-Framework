@@ -1,0 +1,12 @@
+{
+  "UserList": {
+    "filterButtonXPath": "(//*[text()='Filter'])[1]",
+    "fields": {
+      "Status": "Active",
+      "Role": "Admin",
+      "Email": "test@example.com"
+    },
+    "submitfButtonXPath": "(//*[text()='Show Results'])",
+    "resultsRowXPath": "//table//tbody//tr"
+  }
+}
