@@ -160,9 +160,8 @@ Then('User should see able to delete the Team successfully', { timeout: 20000 },
     await handlePopupSimple(this.page, myOrg_json.deleteItem);
 });
 
-
 Then(
-  'I apply filters for {string} and verify results',
+  'User apply filters for {string} and verify results of Roles & Privileges',
   { timeout: 60 * 1000 },                // ← give this step up to 60 s
   async function (tableKey) {
     const cfg = config[tableKey];
@@ -170,4 +169,3 @@ Then(
     await applyFiltersAndValidateResults(this.page, cfg);
   }
 );
-
