@@ -1,17 +1,13 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple,waitUntilPageIsReady, waitUntilpagedomcontentloaded,waitUntilpagenetworkidle,waitUntilpageload, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple,waitUntilPageIsReady, waitUntilpagedomcontentloaded,waitUntilpagenetworkidle,waitUntilpageload, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow,applyFiltersAndValidateResults } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const tableData = require('../testData/tableData.json');
+const config = require('../testData/filter.json');
 
 const fs = require('fs');
 const path = require('path');
 
-Before(async function () {
-    this.browser = await chromium.launch({ headless: false });
-    const context = await this.browser.newContext();
-    this.page = await context.newPage();
-});
 
 After(async function (scenario) {
     if (scenario.result?.status === Status.FAILED) {
@@ -164,4 +160,14 @@ Then('User should see able to delete the Team successfully', { timeout: 20000 },
     await handlePopupSimple(this.page, myOrg_json.deleteItem);
 });
 
+
+Then(
+  'I apply filters for {string} and verify results',
+  { timeout: 60 * 1000 },                // ← give this step up to 60 s
+  async function (tableKey) {
+    const cfg = config[tableKey];
+    if (!cfg) throw new Error(`No filter config for "${tableKey}"`);
+    await applyFiltersAndValidateResults(this.page, cfg);
+  }
+);
 

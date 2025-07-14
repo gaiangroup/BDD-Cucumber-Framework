@@ -447,7 +447,9 @@ export async function sendAndValidateInvites(page, config) {
 
       const { chromium } = await import('playwright');
       const browser = await chromium.launch();
-      const context = await browser.newContext();
+      const context = await browser.newContext({  viewport: { width: 2000, height: 2000 }
+});
+      
       const dummyPage = await context.newPage();
 
       try {
@@ -514,11 +516,83 @@ export async function sendAndValidateInvites(page, config) {
   }
 }
 
+//*******************************Filter ********************************/
+/**
+ * Applies a set of filters and asserts that at least one result appears.
+ 
+ * @param {object} config
+ * @param {string} config.filterButtonXPath   XPath to open the filter panel
+ * @param {{ [label: string]: string }} config.fields   label→value map
+ * @param {string} config.submitButtonXPath   XPath of the “submit filters” button
+ * @param {string} config.resultsRowXPath   XPath matching result rows
+ */
+export async function applyFiltersAndValidateResults(page, config) {
+  const {
+    filterButtonXPath,
+    fields,
+    submitfButtonXPath,
+    resultsRowXPath
+  } = config;
+
+  // 1) Open the filter panel
+  const filterBtn = page.locator(`xpath=${filterButtonXPath}`);
+  await filterBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await filterBtn.click();
+  
+  console.log(`🔍 Opened filter panel`);
+
+  // 2) For each field label → value, try input then dropdown
+  for (const [label, value] of Object.entries(fields)) {
+    // input immediately following a label
+    //const inputXPath = `(//*[normalize-space(text())='${label}']//following::input[1])[1]`;
+    const dropdownXPath = `(//*[normalize-space(text())='${label}']//following::mobius-dropdown-input-container[1])[1]`;
+
+    // const input = page.locator(`xpath=${inputXPath}`);
+    // if (await input.isVisible().catch(() => false)) {
+    //   await input.fill(value);
+    //   console.log(`✅ Filled input "${label}" = "${value}"`);
+    //   continue;
+    // }
+
+await handleGenericForm(page, config.fields)
+
+    const dropdown = page.locator(`xpath=${dropdownXPath}`);
+    if (await dropdown.isVisible().catch(() => false)) {
+      await dropdown.click();
+      const option = page.locator(`xpath=(//*[normalize-space(text())='${value}'])[1]`);
+      await option.waitFor({ state: 'visible', timeout: 3000 });
+      await option.click();
+      console.log(`✅ Selected dropdown "${label}" → "${value}"`);
+      continue;
+    }
+
+    console.warn(`⚠️ No input or dropdown found for label "${label}"`);
+  }
+
+  // 3) Submit filters
+  const submitfBtn = page.locator(`xpath=${submitfButtonXPath}`);
+  await submitfBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await submitfBtn.click();
+  console.log(`🔍 Submitted filters`);
+
+  // 4) Assert results
+  await page.waitForTimeout(1000);
+  const count = await page.locator(`xpath=${resultsRowXPath}`).count();
+  if (count > 0) {
+    console.log(`✅ ${count} result(s) found`);
+  } else {
+    throw new Error(`❌ No results found for filters: ${JSON.stringify(fields)}`);
+  }
+}
+
+
+
 //************ HANDLE ASSERTIONS***************************
 import fs from 'fs';
 import path from 'path';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
+import { loadEnvFile } from 'process';
 export async function handleAssertions(page, data = {}) {
   //*********************Assertion for default text in input fields*********************/
   if (data.inputs) {
