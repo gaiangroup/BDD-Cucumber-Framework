@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 
 export async function handleGenericForm(page, formJson) {
+  await waitUntilpageload(page);
   const fields = formJson.fields || {};
   const buttonText = formJson.buttonText;
   const expectedToast = formJson.expectedToast || null;
@@ -28,7 +29,6 @@ export async function handleGenericForm(page, formJson) {
   //Fill form fields
   for (const [label, config] of Object.entries(fields)) {
     const { value } = config;
-
     try {
       // Handle Date Picker
       if (
@@ -144,8 +144,9 @@ export async function handleGenericForm(page, formJson) {
 
       // Handle Input Field
       const inputLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
-      await inputLocator.waitFor({ state: 'visible', timeout: 10000 });
+      await inputLocator.waitFor({ state: 'visible', timeout: 30000 });
       await inputLocator.click();
+      await waitUntilpagedomcontentloaded(page);
       await page.keyboard.type(value.toString());
 
       let maskedValue = value;
@@ -163,7 +164,9 @@ export async function handleGenericForm(page, formJson) {
   }
 
   // 🔹 Submit form
+
   const actionButton = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
+  console.log(buttonText);
   await actionButton.waitFor({ state: 'visible', timeout: 10000 });
   await expect(actionButton).toBeEnabled();
   await actionButton.click();
@@ -523,14 +526,14 @@ export async function sendAndValidateInvites(page, config) {
  * @param {object} config
  * @param {string} config.filterButtonXPath   XPath to open the filter panel
  * @param {{ [label: string]: string }} config.fields   label→value map
- * @param {string} config.submitButtonXPath   XPath of the “submit filters” button
+ * @param {string} config.buttonText   XPath of the “submit filters” button
  * @param {string} config.resultsRowXPath   XPath matching result rows
  */
 export async function applyFiltersAndValidateResults(page, config) {
   const {
     filterButtonXPath,
     fields,
-    submitfButtonXPath,
+    buttonText,
     resultsRowXPath
   } = config;
 
@@ -541,43 +544,14 @@ export async function applyFiltersAndValidateResults(page, config) {
   
   console.log(`🔍 Opened filter panel`);
 
-  // 2) For each field label → value, try input then dropdown
-  for (const [label, value] of Object.entries(fields)) {
-    // input immediately following a label
-    //const inputXPath = `(//*[normalize-space(text())='${label}']//following::input[1])[1]`;
-    const dropdownXPath = `(//*[normalize-space(text())='${label}']//following::mobius-dropdown-input-container[1])[1]`;
 
-    // const input = page.locator(`xpath=${inputXPath}`);
-    // if (await input.isVisible().catch(() => false)) {
-    //   await input.fill(value);
-    //   console.log(`✅ Filled input "${label}" = "${value}"`);
-    //   continue;
-    // }
-
-await handleGenericForm(page, config.fields)
-
-    const dropdown = page.locator(`xpath=${dropdownXPath}`);
-    if (await dropdown.isVisible().catch(() => false)) {
-      await dropdown.click();
-      const option = page.locator(`xpath=(//*[normalize-space(text())='${value}'])[1]`);
-      await option.waitFor({ state: 'visible', timeout: 3000 });
-      await option.click();
-      console.log(`✅ Selected dropdown "${label}" → "${value}"`);
-      continue;
-    }
-
-    console.warn(`⚠️ No input or dropdown found for label "${label}"`);
-  }
-
-  // 3) Submit filters
-  const submitfBtn = page.locator(`xpath=${submitfButtonXPath}`);
-  await submitfBtn.waitFor({ state: 'visible', timeout: 5000 });
-  await submitfBtn.click();
-  console.log(`🔍 Submitted filters`);
+    await handleGenericForm(page, config)
 
   // 4) Assert results
-  await page.waitForTimeout(1000);
+  await waitUntilpagedomcontentloaded(page);
+
   const count = await page.locator(`xpath=${resultsRowXPath}`).count();
+  console.log(`🔍 Found ${count} result(s) for filters: ${JSON.stringify(fields)}`);
   if (count > 0) {
     console.log(`✅ ${count} result(s) found`);
   } else {

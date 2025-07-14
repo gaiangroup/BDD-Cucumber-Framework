@@ -1,12 +1,22 @@
 {
-  "UserList": {
+  "Infra Structure": {
     "filterButtonXPath": "(//*[text()='Filter'])[1]",
+    "buttonText": "Show Results",
+    "resultsRowXPath": "//table//tbody//mobius-tr",
     "fields": {
-      "Status": "Active",
-      "Role": "Admin",
-      "Email": "test@example.com"
-    },
-    "submitfButtonXPath": "(//*[text()='Show Results'])",
-    "resultsRowXPath": "//table//tbody//tr"
+      "Infra Structure Name": {
+        "value": "test"
+      }
+    }
+  },
+  "Roles & Privileges": {
+    "filterButtonXPath": "(//*[text()='Filter'])[1]",
+    "buttonText": "Show Results",
+    "resultsRowXPath": "//table//tbody//mobius-tr",
+    "fields": {
+      "Role Name": {
+        "value": "test24"
+      }
+    }
   }
 }
