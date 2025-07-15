@@ -1,0 +1,17 @@
+{
+  "Roles & Privileges": {
+    "expectedHeaders": ["Role Type", "Description", "Role Type", "Custom Roles"]
+  },
+  "Users": {
+    "expectedHeaders": ["Name", "Role", "Designation", "Email", "Phone Number"]
+  },
+  "Teams": {
+    "expectedHeaders": ["Team Name", "Description", "Tags", "Members"]
+  },
+  "My Infra": {
+    "expectedHeaders": ["Infrastructure Name", "Created At", "Region"]
+  },
+   "Customers": {
+    "expectedHeaders": ["Customer Name", "Entity/Product", "Date of purchase","Pincode","Organization Name"]
+  }
+}

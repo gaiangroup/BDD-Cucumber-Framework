@@ -1,0 +1,154 @@
+{
+    "tabs": [
+        {
+            "name": "My Organization"
+        },
+        {
+            "name": "Roles & Privileges"
+        },
+        {
+            "name": "Teams"
+        },
+        {
+            "name": "Users"
+        }
+    ],
+    "roleForm_stepper1": {
+        "buttonText": "Next",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "fields": {
+            "Name *": {
+                "value": "AutomationRole"
+            },
+            "Role Type *": {
+                "type": "dropdown",
+                "value": [
+                    "Engineer"
+                ]
+            },
+            "Description *": {
+                "value": "This is a test role for automation"
+            }
+        }
+    },
+    "roleForm_stepper2": {
+        "buttonText": "Next",
+        "matchIndex": 2,
+        "fields": {
+            "Custom Roles *": {
+                "type": "dropdown",
+                "scrollIntoView": true,
+                "value": [
+                    "Project_Write",
+                    "Project_Read"
+                ]
+            }
+        }
+    },
+    "roleForm_stepper3": {
+        "buttonText": "Save",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "expectedToast": "Role Created Successfully",
+        "fields": {
+            "Currency *": {
+                "type": "dropdown",
+                "value": [
+                    "INDIA"
+                ]
+            },
+            "Budget *": {
+                "value": "10000"
+            }
+        }
+    },
+    "button": [
+        {
+            "label": "Add Infrastructure"
+        },
+        {
+            "label": "New Role"
+        },
+        {
+            "label": "Add Team"
+        },
+        {
+            "label": "Invite Users"
+        },
+        {
+            "label": "Procced to Next Step"
+        }
+    ],
+    "keyboardAction": [
+        {
+            "key": "Tab",
+            "repeat": 3,
+            "wait": 500
+        }
+    ],
+    "teamCreation_form": {
+        "buttonText": "Save",
+        "matchIndex": 1,
+        "requiredError": "Please fill out all mandatory fields.",
+        "expectedToast": "Team is created successfully!",
+        "fields": {
+            "Team *": {
+                "value": "Test Automation Team 007"
+            },
+            "Describe what the team does *": {
+                "value": "This team is responsible for automation testing"
+            },
+            "Tags *": {
+                "type": "tag",
+                "value": [
+                    "test1",
+                    "qa"
+                ]
+            },
+            "Members *": {
+                "type": "dropdown",
+                "value": [
+                    "Abhijeet Tehra",
+                    "Abhishek T"
+                ]
+            }
+        }
+    },
+    "emails": [
+        "testjune20@mailinator.com",
+        "bsushma1019@gmail.com"
+    ],
+    "labels": {
+        "emailInput": "Enter mails here to invite people",
+        "sendButton": "Send Invites",
+        "successModal": "ConfirmInvitesModal"
+    },
+    "subject": "You've been invited to join RunRun as a Tenant User",
+    "inboxConfigs": {
+        "mailinator.com": {
+            "urlTemplate": "https://www.mailinator.com/v4/public/inboxes.jsp?to={{inbox}}",
+            "inboxRowSelector": "(//table/tbody/tr)[2]",
+            "iframeSelector": "iframe#texthtml_msg_body"
+        }
+    },
+    "deleteItem": {
+        "expectedText": "Are you sure you want to Delete?",
+        "buttonText": "Delete",
+        "matchingIndex": 1
+    },
+    "menuAction_Role": {
+        "matchIndex": 1,
+        "actionText": "Delete Role",
+        "id": "sticky right"
+    },
+    "menuAction_Team": {
+        "matchIndex": 1,
+        "actionText": "Remove Team",
+        "id": "sticky right"
+    },
+    "scrollContainer": {
+        "id": "organization-main-container",
+        "scrollBy": 1000
+    }
+}
