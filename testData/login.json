@@ -1,5 +1,5 @@
 {
-    "baseUrl": "https://qa-runrun-ui.aidtaas.com/",
+    "baseUrl": "https://runrun-demo.gov-cloud.ai/",
     "login_form": {
         "buttonText": "Login",
         "matchIndex": 1,
@@ -10,7 +10,7 @@
                 "value": "aidtaas@gaiansolutions.com"
             },
             "Password *": {
-                "value": "Gaian@123"
+                "value": "Gaian@1234"
             }
         }
     },
