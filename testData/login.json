@@ -1,5 +1,5 @@
 {
-    "baseUrl": "https://runrun-demo.gov-cloud.ai/",
+    "baseUrl": "https://runrun-ui.gov-cloud.ai",
     "login_form": {
         "buttonText": "Login",
         "matchIndex": 1,
