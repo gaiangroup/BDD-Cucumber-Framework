@@ -75,13 +75,16 @@
         },
         {
             "label": "Invite Users"
+        },
+        {
+            "label": "Procced to Next Step"
         }
     ],
     "keyboardAction": [
         {
             "key": "Tab",
             "repeat": 3,
-            "wait": 300
+            "wait": 500
         }
     ],
     "teamCreation_form": {
@@ -91,7 +94,7 @@
         "expectedToast": "Team is created successfully!",
         "fields": {
             "Team *": {
-                "value": "Test Automation"
+                "value": "Test Automation Team 007"
             },
             "Describe what the team does *": {
                 "value": "This team is responsible for automation testing"
@@ -113,12 +116,39 @@
         }
     },
     "emails": [
-        "testjune20@mailinator.com"
+        "testjune20@mailinator.com",
+        "bsushma1019@gmail.com"
     ],
     "labels": {
-    "emailInput": "Enter mails here to invite people",
-    "sendButton": "Send Invites",
-    "successModal": "Your team invitations are on the way!"
-  },
-    "subject": "Youve been invited to join RunRun as a Tenant User"
+        "emailInput": "Enter mails here to invite people",
+        "sendButton": "Send Invites",
+        "successModal": "ConfirmInvitesModal"
+    },
+    "subject": "You've been invited to join RunRun as a Tenant User",
+    "inboxConfigs": {
+        "mailinator.com": {
+            "urlTemplate": "https://www.mailinator.com/v4/public/inboxes.jsp?to={{inbox}}",
+            "inboxRowSelector": "(//table/tbody/tr)[2]",
+            "iframeSelector": "iframe#texthtml_msg_body"
+        }
+    },
+    "deleteItem": {
+        "expectedText": "Are you sure you want to Delete?",
+        "buttonText": "Delete",
+        "matchingIndex": 1
+    },
+    "menuAction_Role": {
+        "matchIndex": 1,
+        "actionText": "Delete Role",
+        "id": "sticky right"
+    },
+    "menuAction_Team": {
+        "matchIndex": 1,
+        "actionText": "Remove Team",
+        "id": "sticky right"
+    },
+    "scrollContainer": {
+        "id": "organization-main-container",
+        "scrollBy": 1000
+    }
 }

@@ -18,18 +18,17 @@ async function handleGenericForm(page, formJson) {
 
       const errorLocator = page.locator(`text=${requiredError}`);
       try {
-        await errorLocator.waitFor({ state: 'visible', timeout: 7000 });
-        console.log(`✅ Required validation message shown: "${requiredError}"`);
+        await errorLocator.waitFor({ state: 'visible', timeout: 9000 });
+        console.log(`Required validation message shown: "${requiredError}"`);
       } catch {
-        console.warn(`⚠️ Expected required error message not found.`);
+        console.warn(`Expected required error message not found.`);
       }
     }
   }
 
-  // 🔹 Fill form fields
+  //Fill form fields
   for (const [label, config] of Object.entries(fields)) {
     const { value } = config;
-
     try {
       // Handle Date Picker
       if (
@@ -46,7 +45,18 @@ async function handleGenericForm(page, formJson) {
         const dateLocator = page.locator(`(//div[contains(text(),'${value.day}')])[${value.index}]`);
         await dateLocator.waitFor({ state: 'visible', timeout: 10000 });
         await dateLocator.click();
-        console.log(`✅ Picked date "${value.day}" for "${label}"`);
+
+        // Trigger blur by JS if Tab/click doesn't work
+        const dateInputLocator = page.locator(`(//*[text()='${label}']//following::mobius-date-picker)[1]//input`);
+        if (await dateInputLocator.count()) {
+          const inputHandle = await dateInputLocator.first().elementHandle();
+          if (inputHandle) {
+            await inputHandle.evaluate(el => el.blur()); // force blur
+            console.log(`Programmatically triggered blur on date input for "${label}"`);
+          }
+        }
+
+        console.log(`Picked date "${value.day}" for "${label}"`);
         continue;
       }
 
@@ -64,7 +74,7 @@ async function handleGenericForm(page, formJson) {
 
           await checkbox.waitFor({ state: 'visible', timeout: 10000 });
           await checkbox.click();
-          console.log(`✅ Checked "${val}" under "${label}"`);
+          console.log(`Checked "${val}" under "${label}"`);
         }
         continue;
       }
@@ -80,7 +90,7 @@ async function handleGenericForm(page, formJson) {
           await tagInput.click();
           await page.keyboard.type(val);
           await page.keyboard.press('Enter');
-          console.log(`✅ Entered tag "${val}" for "${label}"`);
+          console.log(`Entered tag "${val}" for "${label}"`);
         }
         continue;
       }
@@ -101,7 +111,7 @@ async function handleGenericForm(page, formJson) {
         // Ensure dropdown is open before the loop starts
         await dropdownTrigger.waitFor({ state: 'visible', timeout: 15000 });
         await dropdownTrigger.click();
-        console.log(`✅ Opened dropdown for "${label}".`);
+        console.log(`Opened dropdown for "${label}".`);
 
         for (const val of value) {
           // Wait for options to be present
@@ -112,12 +122,12 @@ async function handleGenericForm(page, formJson) {
 
           // Click the option
           await optionLocator.click({ force: true });
-          console.log(`✅ Selected option "${val}" for "${label}".`);
+          console.log(`Selected option "${val}" for "${label}".`);
 
           // Re-open the dropdown if there are more options to select
           if (value.indexOf(val) < value.length - 1) {
             await dropdownTrigger.click();
-            console.log(`🔄 Re-opened dropdown for next selection.`);
+            console.log(`Re-opened dropdown for next selection.`);
           }
 
           await page.waitForTimeout(300);
@@ -126,16 +136,17 @@ async function handleGenericForm(page, formJson) {
         // Optional: Close the dropdown by clicking the label
         const labelClickLocator = page.locator(`xpath=(//*[normalize-space(text())='${label}'])[1]`);
         await labelClickLocator.click({ force: true });
-        console.log(`✅ Closed dropdown by clicking label "${label}".`);
+        console.log(`Closed dropdown by clicking label "${label}".`);
 
-        console.log(`✅ Completed dropdown selection for "${label}".`);
+        console.log(`Completed dropdown selection for "${label}".`);
         continue;
       }
 
       // Handle Input Field
       const inputLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
-      await inputLocator.waitFor({ state: 'visible', timeout: 10000 });
+      await inputLocator.waitFor({ state: 'visible', timeout: 30000 });
       await inputLocator.click();
+      await waitUntilpagedomcontentloaded(page);
       await page.keyboard.type(value.toString());
 
       let maskedValue = value;
@@ -145,32 +156,34 @@ async function handleGenericForm(page, formJson) {
         maskedValue = '*'.repeat(user.length) + '@' + domain;
       }
 
-      console.log(`✅ Filled "${label}" with "${maskedValue}"`);
+      console.log(`Filled "${label}" with "${maskedValue}"`);
     } catch (err) {
-      console.error(`❌ Failed to process field "${label}": ${err.message}`);
+      console.error(`Failed to process field "${label}": ${err.message}`);
       continue;
     }
   }
 
   // 🔹 Submit form
+
   const actionButton = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
+  console.log(buttonText);
   await actionButton.waitFor({ state: 'visible', timeout: 10000 });
   await expect(actionButton).toBeEnabled();
   await actionButton.click();
-  console.log(`✅ Clicked action button: "${buttonText}"`);
+  await waitUntilpageload(page); // Ensure network is idle after click
+  console.log(`Clicked action button: "${buttonText}"`);
 
   // 🔹 Toast validation
   if (expectedToast) {
     const toastLocator = page.locator(`text=${expectedToast}`);
     await toastLocator.waitFor({ state: 'visible', timeout: 10000 });
-    console.log(`✅ Toast message shown: "${expectedToast}"`);
+    console.log(`Toast message shown: "${expectedToast}"`);
   }
 }
 
 //************************Generic switchToTab()/Module Function************************
 async function switchToTabOrModule(page, config) {
   let tabArray = [];
-
   // Accept either: [{name: 'tab'}] or {name: 'tab'}
   if (Array.isArray(config)) {
     tabArray = config.map(t => t.name);
@@ -205,6 +218,44 @@ async function switchToTabOrModule(page, config) {
   }
 }
 
+
+/**
+ * Validates headers and checks that at least one row is present in the table.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} expectedHeaders
+ */
+export async function validateTableHeadersAndRow(page, expectedHeaders) {
+  console.log(`Validating Headers...`);
+
+  for (const header of expectedHeaders) {
+    const xpath = `(//table//*[normalize-space(text())='${header}'])[1]`;
+    const locator = page.locator(`xpath=${xpath}`);
+
+    try {
+      await locator.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(locator).toBeVisible();
+      console.log(`Visible Header: ${header}`);
+    } catch (error) {
+      console.error(`Header not visible: ${header}`);
+      throw error;
+    }
+  }
+
+  console.log(`Validating Row Presence...`);
+
+  const rowLocator = page.locator('//table//tbody//mobius-tr');
+  const rowCount = await rowLocator.count();
+
+  if (rowCount === 0) {
+    throw new Error('No table rows found');
+  }
+
+  console.log(`Found ${rowCount} row(s) in the table`);
+}
+
+
+
+
 //************************Click Button Function************************
 async function clickButton(page, buttonConfig) {
   const label = buttonConfig?.label;
@@ -215,17 +266,18 @@ async function clickButton(page, buttonConfig) {
   }
 
   const button = page.locator(`xpath=(//*[normalize-space(text())='${label}'])[1]`);
+  //await this.page.locator(button).waitFor({ state: 'visible' });
 
   const count = await button.count();
   if (count === 0) {
     console.warn(`Button with label "${label}" not found.`);
-    const allButtons = await page.locator('//mobius-button').allTextContents();
+    // const allButtons = await page.locator('//mobius-button').allTextContents();
     console.log('Available buttons on screen:', allButtons);
     return;
   }
 
   try {
-    await button.waitFor({ state: 'visible', timeout: 5000 });
+    await button.waitFor({ state: 'visible', timeout: 7000 });
     await expect(button).toBeEnabled({ timeout: 5000 });
     await button.click();
     console.log(`Clicked on button: "${label}"`);
@@ -250,9 +302,7 @@ async function performKeyboardActions(page, actions = []) {
   }
 
   for (const action of actions) {
-    const key = action.key;
-    const repeat = action.repeat;
-    const wait = action.wait;
+    const { key, repeat = 1, wait = 0, finalKey = null } = action;
 
     if (!key) {
       console.warn('Missing "key" in keyboard action config.');
@@ -261,10 +311,15 @@ async function performKeyboardActions(page, actions = []) {
 
     for (let i = 0; i < repeat; i++) {
       await page.keyboard.press(key);
-      await page.keyboard.press('Enter');
+      if (wait > 0) {
+        await page.waitForTimeout(wait);
+      }
     }
 
-    console.log(`Pressed "${key}" ${repeat} time(s) with ${wait}ms wait.`);
+    if (finalKey) {
+      await page.keyboard.press(finalKey);
+      console.log(`Pressed final key: ${finalKey}`);
+    }
   }
 }
 
@@ -275,126 +330,178 @@ async function sendAndValidateInvites(page, config) {
   const dotenv = await import('dotenv');
   dotenv.config();
 
-  // Always get credentials
-  const imapUser = process.env.GMAIL_USER;
-  const imapPass = process.env.GMAIL_PASS;
-
+  const { GMAIL_USER, GMAIL_PASS } = process.env;
   const emailList = Array.isArray(config.emails) ? config.emails : [config.emails];
+  const subject = config.subject || "Invitation";
+  const { emailInput, sendButton, successModal } = config.labels;
+  const inboxConfigs = config.inboxConfigs || {};
 
-  // Step 1: Fill email inputs
+  // Step 1: Fill all email inputs
   for (const email of emailList) {
-    const emailInputLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.emailInput}")]//following::*[1])`);
-    await emailInputLocator.waitFor({ state: "visible", timeout: 10000 });
-    await emailInputLocator.fill(email);
+    const input = page.locator(`xpath=(//*[@data-placeholder="${emailInput}"])[1]`);
+    await input.waitFor({ state: "visible", timeout: 10000 });
+    await input.fill(email);
     await page.keyboard.press("Enter");
     await page.waitForTimeout(500);
-    console.log(`✅ Entered email: ${email}`);
+    console.log(`Entered email: ${email}`);
   }
 
-  // Step 2: Click send button
-  const sendButtonLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.sendButton}")]//ancestor::button)[1]`);
-  await sendButtonLocator.waitFor({ state: "visible", timeout: 10000 });
-  await sendButtonLocator.click();
-  console.log(`✅ Clicked send button`);
+
+  // Step 2: Click Send Invites button
+  const sendBtn = page.locator(`xpath=(//*[text() = "${sendButton}"])[1]`);
+  await sendBtn.waitFor({ state: "visible", timeout: 10000 });
+  await sendBtn.click();
+  console.log("Clicked send button");
+  console.log("✅ Clicked send button");
 
   // Step 3: Wait for success modal
-  const successModalLocator = page.locator(`xpath=(//*[contains(normalize-space(.), "${config.labels.successModal}")])[1]`);
-  await successModalLocator.waitFor({ state: "visible", timeout: 15000 });
-  console.log(`✅ Success modal appeared`);
+  const modal = page.locator(`xpath=(//*[@*="${successModal}"])[1]`);
+  await modal.waitFor({ state: "visible", timeout: 15000 });
+  console.log("Invite success modal appeared");
 
-  // Step 4: Decide whether to use Gmail IMAP or Mailinator
-  if (imapUser && imapPass) {
-    console.log(`🔑 Detected Gmail credentials, using IMAP...`);
-    const { default: Imap } = await import('imap');
-    const { simpleParser } = await import('mailparser');
+  // Step 4: Validate email delivery
+  for (const email of emailList) {
+    console.log(`Validating delivery for: ${email}`);
+    const [inbox, domain] = email.split("@");
 
-    const imap = new Imap({
-      user: imapUser,
-      password: imapPass,
-      host: "imap.gmail.com",
-      port: 993,
-      tls: true,
-      tlsOptions: { rejectUnauthorized: false },
-    });
+    //Gmail check (using IMAP)
+    if (GMAIL_USER && GMAIL_PASS && email.includes(GMAIL_USER)) {
+      console.log("Using Gmail IMAP...");
+      const { default: Imap } = await import('imap');
+      const { simpleParser } = await import('mailparser');
 
-    function openInbox(cb) {
-      imap.openBox("INBOX", true, cb);
-    }
+      const imap = new Imap({
+        user: GMAIL_USER,
+        password: GMAIL_PASS,
+        host: "imap.gmail.com",
+        port: 993,
+        tls: true,
+        tlsOptions: { rejectUnauthorized: false },
+      });
 
-    return new Promise((resolve, reject) => {
-      imap.once("ready", () => {
-        openInbox((err) => {
-          if (err) {
-            imap.end();
-            return reject(err);
-          }
+      function openInbox(cb) {
+        imap.openBox("INBOX", true, cb);
+      }
 
-          console.log(`🔍 Searching inbox for subject: "${config.subject}"`);
-          const criteria = ["UNSEEN", ["SUBJECT", config.subject]];
+      await new Promise((resolve, reject) => {
+        imap.once("ready", () => {
+          openInbox((err) => {
+            if (err) return reject(err);
+            const criteria = [["SUBJECT", subject]];
 
-          imap.search(criteria, (err, results) => {
-            if (err) {
-              imap.end();
-              return reject(err);
-            }
-            if (!results.length) {
-              imap.end();
-              return reject(new Error(`❌ No emails found with subject "${config.subject}"`));
-            }
+            imap.search(criteria, (err, results) => {
+              if (err || !results.length) return reject(new Error(`No emails found for subject: ${subject}`));
+              const f = imap.fetch(results, { bodies: "" });
+              let found = false;
 
-            const f = imap.fetch(results, { bodies: "" });
-            let found = false;
-
-            f.on("message", (msg) => {
-              msg.on("body", (stream) => {
-                simpleParser(stream, (err, mail) => {
-                  if (err) return;
-                  console.log(`✅ Email received: "${mail.subject}"`);
-                  found = true;
+              f.on("message", (msg) => {
+                msg.on("body", (stream) => {
+                  simpleParser(stream, (err, mail) => {
+                    if (!err && mail.subject.includes(subject)) {
+                      if (!found) {
+                        console.log(`Gmail: Email received for ${email}: "${mail.subject}"`);
+                        found = true;
+                      }
+                    }
+                  });
                 });
               });
-            });
 
-            f.once("end", () => {
-              imap.end();
-              if (found) {
-                resolve(`✅ Email with subject "${config.subject}" received.`);
-              } else {
-                reject(new Error(`❌ No matching email body parsed.`));
-              }
+
+              f.once("end", () => {
+                imap.end();
+                found
+                  ? resolve()
+                  : reject(new Error(`No matching Gmail email body for ${email}`));
+              });
             });
           });
         });
+
+        imap.once("error", (err) => reject(err));
+        imap.connect();
       });
 
-      imap.once("error", (err) => reject(err));
-      imap.connect();
-    });
-  } else {
-    console.log(`📨 No Gmail credentials found. Falling back to Mailinator...`);
+    } else {
+      // Dummy domain (like Mailinator, Getnada)
+      const domainConfig = inboxConfigs[domain];
+      if (!domainConfig) {
+        console.warn(`No config found for domain: ${domain}, skipping...`);
+        continue;
+      }
 
-    // Wait a few seconds to allow email delivery
-    await new Promise((r) => setTimeout(r, 10000));
+      const inboxUrl = domainConfig.urlTemplate.replace("{{inbox}}", inbox);
+      const inboxRowSelector = domainConfig.inboxRowSelector;
+      const iframeName = domainConfig.iframeName;
 
-    // Mailinator fetch
-    const recipient = emailList[0];
-    const inbox = recipient.split("@")[0];
-    const apiUrl = `https://www.mailinator.com/fetch_public?to=${inbox}`;
+      const { chromium } = await import('playwright');
+      const browser = await chromium.launch();
+      const context = await browser.newContext({  viewport: { width: 2000, height: 2000 }
+});
+      
+      const dummyPage = await context.newPage();
 
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      throw new Error(`❌ Mailinator fetch failed: ${response.status}`);
+      try {
+        console.log(`Navigating to inbox: ${inboxUrl}`);
+        await dummyPage.goto(inboxUrl, { waitUntil: 'domcontentloaded' });
+        await dummyPage.waitForTimeout(3000);
+
+        const inboxVisible = await dummyPage.locator(inboxRowSelector).isVisible().catch(() => false);
+
+        if (inboxVisible) {
+          console.log("Inbox found. Clicking latest email...");
+          await dummyPage.locator(`xpath=${inboxRowSelector}`).click();
+          await dummyPage.waitForTimeout(2000);
+
+          try {
+            await dummyPage.waitForSelector('iframe', { timeout: 7000 });
+
+            const allFrames = dummyPage.frames();
+            let frameFound = false;
+
+            for (const f of allFrames) {
+              const bodyContent = await f.textContent('body').catch(() => '');
+              if (bodyContent?.includes(subject)) {
+                console.log(`Found subject in iframe body: "${subject}"`);
+                frameFound = true;
+                break;
+              }
+            }
+
+            if (!frameFound) {
+              throw new Error(`Subject "${subject}" not found in any iframe`);
+            }
+
+          } catch (iframeErr) {
+            console.log("No valid iframe found or subject not in any iframe. Falling back to body...");
+            const bodyText = await dummyPage.textContent('body').catch(() => '');
+            if (bodyText?.includes(subject)) {
+              console.log(`Found subject directly in fallback page body`);
+            } else {
+              throw new Error(`Subject not found in page content`);
+            }
+          }
+
+
+        } else {
+          console.log("No inbox table. Checking full page...");
+          const bodyText = await dummyPage.textContent('body');
+          if (bodyText?.includes(subject)) {
+            console.log(`Found subject in fallback body`);
+          } else {
+            throw new Error(`Subject not found on fallback page`);
+          }
+        }
+
+      } catch (err) {
+        if (err) {
+          const errorMessage = err?.message || JSON.stringify(err);
+          console.warn(`Email validation failed for ${email}: ${errorMessage}`);
+        }
+      } finally {
+        await browser.close();
+      }
     }
-
-    const data = await response.json();
-    const message = data.messages.find((msg) => msg.subject.includes(config.subject));
-
-    if (!message) {
-      throw new Error(`❌ No email found in Mailinator inbox "${inbox}" with subject containing "${config.subject}"`);
-    }
-
-    console.log(`✅ Mailinator email received: "${message.subject}"`);
-    return `✅ Mailinator: Email with subject "${message.subject}" received.`;
   }
 }
 

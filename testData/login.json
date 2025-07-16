@@ -1,4 +1,5 @@
 {
+    "baseUrl": "https://runrun-demo.gov-cloud.ai/",
     "login_form": {
         "buttonText": "Login",
         "matchIndex": 1,
@@ -9,14 +10,14 @@
                 "value": "aidtaas@gaiansolutions.com"
             },
             "Password *": {
-                "value": "Gaian@123"
+                "value": "Gaian@1234"
             }
         }
     },
-    "login_Invalidcred": {
+    "negativeTestData_1": {
         "buttonText": "Login",
         "matchIndex": 1,
-        "requiredError": "Please fill out all mandatory fields.",
+        "expectedToast": "User not found.",
         "fields": {
             "Email *": {
                 "value": "abc@gmail.com"
@@ -25,5 +26,44 @@
                 "value": "01234@gaian"
             }
         }
-    }
+    },
+    "negativeTestData_2": {
+        "buttonText": "Login",
+        "matchIndex": 1,
+        "expectedToast": "Invalid credentials",
+        "fields": {
+            "Email *": {
+                "value": "aidtaas@gaiansolutions.com"
+            },
+            "Password *": {
+                "value": "01234@gaian"
+            }
+        }
+    },
+    "screenshots": [
+        {
+            "expectedName": "Dashboard_Screenshot",
+            "folder": "screenshots"
+        }
+    ],
+    "texts": [
+        {
+            "descriptionOfField": "Asserting visibility of Email field label",
+            "expectedVisibleText": "Email *"
+        },
+        {
+            "descriptionOfField": "Asserting visibility of Password field label",
+            "expectedVisibleText": "Password *"
+        }
+    ],
+    "placeholders": [
+        {
+            "descriptionOfField": "Asserting visibility of Email Placeholder Field",
+            "expectedPlaceholder": "Enter Email"
+        },
+        {
+            "descriptionOfField": "Asserting visibility of Password Placeholder Field",
+            "expectedPlaceholder": "Enter Password"
+        }
+    ]
 }

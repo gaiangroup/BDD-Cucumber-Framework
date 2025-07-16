@@ -1,11 +1,13 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const archiver = require('archiver');
+const multipleReport = require('multiple-cucumber-html-reporter');
+const singleReport = require('cucumber-html-reporter');
 
 const defaultTag = '@editStorage';
 
 const defaultFeatureDir = 'features';
-const reportJsonPath = path.join(__dirname, '..', 'reports', 'cucumber_report.json');
 
 const defaultOptions = [
   '--require', 'step_definitions/**/*.js',

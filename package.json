@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "clean": "rimraf reports/*",
-    "test": "npx cucumber-js features/editStorage.feature --format json:reports/editStorage-report.json",
-    "report": "node generate-report.js reports/editStorage-report.json reports/html/editStorage-report.html"
+    "test": "node runner.js",
+    "postinstall": "npx playwright install"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +14,7 @@
     "@cucumber/cucumber": "^11.3.0",
     "@playwright/test": "^1.53.2",
     "allure-commandline": "^2.34.1",
+    "archiver": "^7.0.1",
     "chai": "^5.2.0",
     "dotenv": "^17.0.1",
     "inline-source": "^8.0.3",
