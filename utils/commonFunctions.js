@@ -13,6 +13,7 @@ export async function handleGenericForm(page, formJson) {
     const submitBtn = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
     if (await submitBtn.isVisible()) {
       await expect(submitBtn).toBeEnabled();
+      await highlightElement(page, submitBtn);
       await submitBtn.click();
       console.log(`Clicked action button (pre-submit): "${buttonText}"`);
 
@@ -40,10 +41,12 @@ export async function handleGenericForm(page, formJson) {
       ) {
         const datePickerTrigger = page.locator(`(//*[text()='${label}']//following::mobius-date-picker)[1]`);
         await datePickerTrigger.waitFor({ state: 'visible', timeout: 10000 });
+        await highlightElement(page, datePickerTrigger);
         await datePickerTrigger.click({ force: true });
 
         const dateLocator = page.locator(`(//div[contains(text(),'${value.day}')])[${value.index}]`);
         await dateLocator.waitFor({ state: 'visible', timeout: 10000 });
+        await highlightElement(page, dateLocator);
         await dateLocator.click();
 
         // Trigger blur by JS if Tab/click doesn't work
@@ -73,6 +76,8 @@ export async function handleGenericForm(page, formJson) {
           );
 
           await checkbox.waitFor({ state: 'visible', timeout: 10000 });
+          await highlightElement(page, checkbox);
+
           await checkbox.click();
           console.log(`Checked "${val}" under "${label}"`);
         }
@@ -87,6 +92,8 @@ export async function handleGenericForm(page, formJson) {
         const tagInput = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[3])[1]`);
         await tagInput.waitFor({ state: 'visible', timeout: 10000 });
         for (const val of value) {
+          await highlightElement(page, tagInput);
+
           await tagInput.click();
           await page.keyboard.type(val);
           await page.keyboard.press('Enter');
@@ -110,6 +117,8 @@ export async function handleGenericForm(page, formJson) {
 
         // Ensure dropdown is open before the loop starts
         await dropdownTrigger.waitFor({ state: 'visible', timeout: 15000 });
+        await highlightElement(page, dropdownTrigger);
+
         await dropdownTrigger.click();
         console.log(`Opened dropdown for "${label}".`);
 
@@ -119,6 +128,7 @@ export async function handleGenericForm(page, formJson) {
 
           const optionLocator = page.locator(`xpath=(//mobius-list-item[normalize-space(text())='${val}'])[1]`);
           console.log(`Looking for option "${val}" in dropdown "${label}"...`);
+          await highlightElement(page, optionLocator);
 
           // Click the option
           await optionLocator.click({ force: true });
@@ -126,6 +136,7 @@ export async function handleGenericForm(page, formJson) {
 
           // Re-open the dropdown if there are more options to select
           if (value.indexOf(val) < value.length - 1) {
+            await highlightElement(page, dropdownTrigger);
             await dropdownTrigger.click();
             console.log(`Re-opened dropdown for next selection.`);
           }
@@ -135,6 +146,8 @@ export async function handleGenericForm(page, formJson) {
 
         // Optional: Close the dropdown by clicking the label
         const labelClickLocator = page.locator(`xpath=(//*[normalize-space(text())='${label}'])[1]`);
+        await highlightElement(page, labelClickLocator);
+
         await labelClickLocator.click({ force: true });
         console.log(`Closed dropdown by clicking label "${label}".`);
 
@@ -145,6 +158,8 @@ export async function handleGenericForm(page, formJson) {
       // Handle Input Field
       const inputLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
       await inputLocator.waitFor({ state: 'visible', timeout: 30000 });
+      await highlightElement(page, inputLocator);
+
       await inputLocator.click();
       await waitUntilpagedomcontentloaded(page);
       await page.keyboard.type(value.toString());
@@ -169,6 +184,8 @@ export async function handleGenericForm(page, formJson) {
   console.log(buttonText);
   await actionButton.waitFor({ state: 'visible', timeout: 10000 });
   await expect(actionButton).toBeEnabled();
+  await highlightElement(page, actionButton);
+
   await actionButton.click();
   await waitUntilpageload(page); // Ensure network is idle after click
   console.log(`Clicked action button: "${buttonText}"`);
@@ -211,6 +228,7 @@ export async function switchToTabOrModule(page, config) {
     }
 
     if (await tabLocator.isVisible()) {
+      await highlightElement(page, tabLocator);
       await tabLocator.click();
       console.log(`Switched to tab/module: "${tabText}"`);
     } else {
@@ -280,13 +298,39 @@ export async function clickButton(page, buttonConfig) {
   try {
     await button.waitFor({ state: 'visible', timeout: 7000 });
     await expect(button).toBeEnabled({ timeout: 5000 });
+    await highlightElement(page, button);
+
     await button.click();
+
     console.log(`Clicked on button: "${label}"`);
   } catch (error) {
     console.error(`Failed to click button "${label}":`, error.message);
     throw error;
   }
 }
+
+/**
+ * Highlights an element on the page by applying a flashing outline.
+ * @param {import('@playwright/test').Page} page - The Playwright page instance.
+ * @param {string} selector - The selector of the element to highlight.
+ */
+export async function highlightElement(page, locator) {
+  const elementHandle = await locator.elementHandle();
+  if (!elementHandle) {
+    console.warn('Element handle not found for highlight.');
+    return;
+  }
+
+  await page.evaluate(el => {
+    const originalOutline = el.style.outline;
+    el.style.transition = 'outline 0.2s ease-in-out';
+    el.style.outline = '2px solid pink';
+    setTimeout(() => {
+      el.style.outline = originalOutline;
+    }, 1000);
+  }, elementHandle);
+}
+
 
 //*************************Wait Until Page is Ready************************
 
@@ -303,7 +347,7 @@ export async function waitUntilpageload(page) {
 }
 export async function waitUntilpagenetworkidle(page) {
   await page.waitForLoadState('networkidle', { timeout: 50000 });
- 
+
 }
 export async function waitUntilpagedomcontentloaded(page) {
   await page.waitForLoadState('domcontentloaded', { timeout: 50000 }); // Waits until the DOM is parsed
@@ -333,11 +377,14 @@ export async function performKeyboardActions(page, actions = []) {
     }
 
     if (finalKey) {
+      await waitUntilpagenetworkidle(page);
       await page.keyboard.press(finalKey);
       console.log(`Pressed final key: ${finalKey}`);
     }
   }
 }
+
+
 
 //*************************Email Invite subject validation************************
 export async function sendAndValidateInvites(page, config) {
@@ -364,6 +411,8 @@ export async function sendAndValidateInvites(page, config) {
   // Step 2: Click Send Invites button
   const sendBtn = page.locator(`xpath=(//*[text() = "${sendButton}"])[1]`);
   await sendBtn.waitFor({ state: "visible", timeout: 10000 });
+  await highlightElement(page, sendBtn);
+
   await sendBtn.click();
   console.log("Clicked send button");
   console.log("✅ Clicked send button");
@@ -450,9 +499,10 @@ export async function sendAndValidateInvites(page, config) {
 
       const { chromium } = await import('playwright');
       const browser = await chromium.launch();
-      const context = await browser.newContext({  viewport: { width: 2000, height: 2000 }
-});
-      
+      const context = await browser.newContext({
+        viewport: { width: 2000, height: 2000 }
+      });
+
       const dummyPage = await context.newPage();
 
       try {
@@ -464,6 +514,8 @@ export async function sendAndValidateInvites(page, config) {
 
         if (inboxVisible) {
           console.log("Inbox found. Clicking latest email...");
+          await highlightElement(page, inboxRowSelector);
+
           await dummyPage.locator(`xpath=${inboxRowSelector}`).click();
           await dummyPage.waitForTimeout(2000);
 
@@ -540,12 +592,14 @@ export async function applyFiltersAndValidateResults(page, config) {
   // 1) Open the filter panel
   const filterBtn = page.locator(`xpath=${filterButtonXPath}`);
   await filterBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await highlightElement(page, filterBtn);
+
   await filterBtn.click();
-  
+
   console.log(`🔍 Opened filter panel`);
 
 
-    await handleGenericForm(page, config)
+  await handleGenericForm(page, config)
 
   // 4) Assert results
   await waitUntilpagedomcontentloaded(page);
@@ -749,6 +803,8 @@ export async function handlePopupSimple(page, config) {
 
   // Click the desired button
   const button = page.locator(`xpath=(//*[text()='${buttonText}'])[${matchingIndex}]`);
+  await highlightElement(page, button);
+
   await button.click();
   console.log(`Clicked "${buttonText}" button and deleted the item successfully.`);
 }
@@ -781,12 +837,16 @@ export async function threeDotActionMenu(page, config) {
   await menuItem.waitFor({ state: 'visible', timeout: 6000 });
 
   try {
+    await highlightElement(page, menuItem);
+
     await menuItem.click({ timeout: 3000 });
     console.log(`Clicked on three-dot menu at index ${index}`);
   } catch (err) {
     console.warn(`Standard click failed. Trying JS click on menu index ${index}`);
     const elementHandle = await menuItem.elementHandle();
     if (elementHandle) {
+      await highlightElement(page, elementHandle);
+
       await page.evaluate(el => el.click(), elementHandle);
     } else {
       throw new Error(`Unable to get element handle for three-dot menu at index ${index}`);
@@ -797,6 +857,7 @@ export async function threeDotActionMenu(page, config) {
   const actionLocator = page.locator(`xpath=(//*[text()='${actionText}'])[1]`);
   try {
     await actionLocator.waitFor({ state: 'visible', timeout: 6000 });
+    await highlightElement(page, actionLocator);
     await actionLocator.click();
     console.log(`Selected action: "${actionText}"`);
   } catch (err) {

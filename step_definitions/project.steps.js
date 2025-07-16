@@ -40,11 +40,10 @@ Then('User should fill all the required details to create project', { timeout: 2
 }
 );
 Then('User should click on three dot menu and choose Delete action', { timeout: 20000 }, async function () {
-    await waitUntilPageIsReady(this.page);
     await threeDotActionMenu(this.page, project_testData.menuAction_Project);
 });
 Then('User should see able to delete the Project successfully', { timeout: 20000 }, async function () {
-    await waitUntilPageIsReady(this.page);
+    await waitUntilpageload(this.page);
     await handlePopupSimple(this.page, project_testData.deleteProjectItem);
 });
 

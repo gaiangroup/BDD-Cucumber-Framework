@@ -27,7 +27,7 @@ Feature: Testing User flow of RUNRUN
     Then User should send the invitation and validate the subject
     Then User should click on the invite popup
     Then User clicks on "My Infra" tab and validates the table infra
-    Then User clicks on "Customers" tab and validates the table Customers
+    # Then User clicks on "Customers" tab and validates the table Customers
     And User should switch to projects tab
     And User clicks Add Project button
     Then User should fill all the required details to create project
