@@ -3,7 +3,8 @@ Feature: Testing User flow of RUNRUN
 
   Background: Login
     Given User navigate to the login page
-    When User login with valid credentials and successful login
+    # When User login with valid credentials and successful login
+    When validate API "Login" is called with correct request and response
 
   Scenario: Login and perform CRUD operations as a user
 

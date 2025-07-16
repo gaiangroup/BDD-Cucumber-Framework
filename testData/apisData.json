@@ -1,0 +1,61 @@
+{
+  "Login": {
+    "urlPattern": "/mobius-iam-service/v2.0/login?mask=false",
+    "method": "POST",
+    "expectedRequestBody": {
+      "userName": "aidtaas@gaiansolutions.com",
+      "password": "Gaian@1234",
+      "productId": "c2255be4-ddf6-449e-a1e0-b4f7f9a2b636",
+      "platformId": "67e1471506da752b78716d21",
+      "provider": "PASSWORD"
+    },
+    "expectedResponse": {
+      "tenantId": "2cf76e5f-26ad-4f2c-bccc-f4bc1e7bfb64",
+      "platformId": "67e1471506da752b78716d21",
+      "email": "aidtaas@gaiansolutions.com"
+    }
+  },
+  "Infra Structure": {
+    "urlPattern": "/pi-entity-instances-service/v2.0/",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer [YOUR_TOKEN_HERE]"
+    },
+    "expectedRequestBody": {
+      "dbType": "TIDB",
+      "filter": {
+        "infrastructurename": "test"
+      },
+      "RequesterId": "2cf76e5f-26ad-4f2c-bccc-f4bc1e7bfb64"
+    },
+    "expectedResponse": {
+      "pageNumber": 0,
+      "pageSize": 10,
+      "noOfInstances": 1,
+      "totalInstances": 1,
+      "totalPages": 1,
+      "content": [
+        {
+          "summary": "test",
+          "infrastructurename": "test",
+          "id": "4abcb8a9-9c47-1413-a384-8b7332847282",
+          "lastupdate": "",
+          "region": "test",
+          "organizationid": "664af8d0c002126e0518a9d1",
+          "tenantid": "2cf76e5f-26ad-4f2c-bccc-f4bc1e7bfb64",
+          "pincode": "831005",
+          "address": "tes",
+          "piMetadata": {
+            "tenantID": "2cf76e5f-26ad-4f2c-bccc-f4bc1e7bfb64",
+            "creationTimeMS": 1750254115727,
+            "entityId": "5a0fc080-a50f-4f52-a1e4-02e6f8f39b27",
+            "transactionId": "2d287fd2-a519-4517-9425-0fe222f2d962"
+          }
+        }
+      ],
+      "relations": [],
+      "customReferencedData": {}
+    }
+  }
+}
