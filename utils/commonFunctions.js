@@ -323,8 +323,8 @@ export async function highlightElement(page, locator) {
 
   await page.evaluate(el => {
     const originalOutline = el.style.outline;
-    el.style.transition = 'outline 0.3s ease-in-out';
-    el.style.outline = '1px solid purple';
+    el.style.transition = 'outline 0.2s ease-in-out';
+    el.style.outline = '2px solid pink';
     setTimeout(() => {
       el.style.outline = originalOutline;
     }, 1000);
