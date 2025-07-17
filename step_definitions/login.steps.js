@@ -43,6 +43,7 @@ When('User verifies placeholder text for each field is correct', { timeout: 2000
     await handleAssertions(this.page, login_testData.placeholders);
 });
 
+<<<<<<< HEAD
 // When('User login with valid credentials and successful login', { timeout: 50000 }, async function () {
 //     await handleGenericForm(this.page, login_testData.login_form);
 //     await waitUntilPageIsReady(this.page);
@@ -59,6 +60,10 @@ Then(
     const apiPromise = interceptAndValidateApi(this.page, config);
     
     // Trigger the action that will call the API
+=======
+
+When('User login with valid credentials and successful login', { timeout: 50000 }, async function () {
+>>>>>>> 3f0f10b5925ddffe3fcea5917519e54ee5e9f161
     await handleGenericForm(this.page, login_testData.login_form);
     
     // Now wait for the API interception

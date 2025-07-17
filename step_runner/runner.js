@@ -83,6 +83,8 @@ cucumber.on('close', (code) => {
       jsonDir: latestJsonDir,
       reportPath: detailedHtmlReportPath,
       reportName: `RunRun Detailed Test Report - ${timestamp}`,
+      openReportInBrowser: true,
+      launchReport: false,
       metadata: {
         browser: { name: 'chrome', version: 'latest' },
         device: 'Local test machine',
@@ -97,7 +99,9 @@ cucumber.on('close', (code) => {
       jsonFile: reportJsonPath,
       output: summaryHtmlReportPath,
       reportSuiteAsScenarios: true,
-      launchReport: false,
+      launchReport: true,
+      openReportInBrowser: true,
+
       metadata: {
         "Platform": "Ubuntu 20.04",
         "Browser": "Chromium latest",
