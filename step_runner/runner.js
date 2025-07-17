@@ -15,7 +15,7 @@ if (fs.existsSync(reportJsonPath)) {
   fs.unlinkSync(reportJsonPath);
 }
 
-const defaultTag = '@expandCollapse';
+const defaultTag = '@tooltip';
 const defaultFeatureDir = 'features';
 const args = process.argv.slice(2);
 const tagArg = args[0] || defaultTag;
