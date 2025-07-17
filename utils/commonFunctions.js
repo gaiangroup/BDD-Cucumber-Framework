@@ -166,7 +166,7 @@ export async function handleGenericForm(page, formJson) {
 
       await waitUntilpagedomcontentloaded(page);
       await page.keyboard.type(value.toString());
-       
+
       let maskedValue = value;
       if (label.toLowerCase().includes('password')) maskedValue = '****';
       if (typeof value === 'string' && value.includes('@')) {
@@ -304,8 +304,8 @@ export async function interceptAndValidateApi(page, config) {
           }
 
           clearTimeout(timeout);
-          resolve({ 
-            request: parsedBody, 
+          resolve({
+            request: parsedBody,
             response: json,
             statusCode: response.status()
           });
@@ -355,7 +355,7 @@ export async function interceptAndValidateApi(page, config) {
 //     if (await tabLocator.isVisible()) {
 //       await highlightElement(page, tabLocator);
 //       await waitUntilpagenetworkidle(page);
-    
+
 //       console.log(`Switching to tab/module: "${tabLocator}"`);
 //       await tabLocator.click();
 //          await waitUntilpageload(page);
@@ -369,7 +369,7 @@ export async function interceptAndValidateApi(page, config) {
 export async function switchToTabOrModule(page, config) {
   await waitUntilpagedomcontentloaded(page);
   let tabArray = [];
-  
+
   // Handle different config formats
   if (Array.isArray(config)) {
     tabArray = config.map(t => t.name);
@@ -391,19 +391,19 @@ export async function switchToTabOrModule(page, config) {
     try {
       // More flexible locator that handles different cases
       const tabLocator = page.locator(`xpath=//*[contains(text(), '${tabText}')]`).first();
-      
+
       console.log(`Attempting to switch to tab/module: "${tabText}"`);
-      
+
       // Wait for the tab to be present and visible
       await tabLocator.waitFor({ state: 'visible', timeout: 10000 });
-      
+
       await highlightElement(page, tabLocator);
       await waitUntilpagenetworkidle(page);
-      
+
       console.log(`Clicking tab/module: "${tabText}"`);
       await tabLocator.click();
       await waitUntilpageload(page);
-      
+
       console.log(`Successfully switched to tab/module: "${tabText}"`);
     } catch (error) {
       console.error(`Failed to switch to tab/module "${tabText}":`, error.message);
