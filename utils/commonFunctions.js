@@ -1,5 +1,6 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 import { expect } from '@playwright/test';
-
 export async function handleGenericForm(page, formJson) {
   await waitUntilpageload(page);
   const fields = formJson.fields || {};
@@ -15,6 +16,7 @@ export async function handleGenericForm(page, formJson) {
       await expect(submitBtn).toBeEnabled();
       await highlightElement(page, submitBtn);
       await submitBtn.click();
+      waitUntilpagenetworkidle(page); // Ensure network is idle after click
       console.log(`Clicked action button (pre-submit): "${buttonText}"`);
 
       const errorLocator = page.locator(`text=${requiredError}`);
@@ -187,7 +189,6 @@ export async function handleGenericForm(page, formJson) {
   await highlightElement(page, actionButton);
 
   await actionButton.click();
-  await waitUntilpageload(page); // Ensure network is idle after click
   console.log(`Clicked action button: "${buttonText}"`);
 
   // 🔹 Toast validation
@@ -198,9 +199,85 @@ export async function handleGenericForm(page, formJson) {
   }
 }
 
+export async function interceptAndValidateApi(page, config) {
+  const {
+    urlPattern,
+    method,
+    expectedRequestBody,
+    expectedResponse,
+  } = config;
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`❌ Timed out waiting for API call: ${urlPattern}`));
+    }, 10000); // 10 seconds max wait
+
+    // Listen for the request
+    page.on('request', async (request) => {
+      if (
+        request.url().includes(urlPattern) &&
+        (!method || request.method().toLowerCase() === method.toLowerCase())
+      ) {
+        try {
+          const postData = request.postData();
+          const parsedBody = postData ? JSON.parse(postData) : null;
+
+          console.log('📤 Request:', request.url(), parsedBody);
+
+          // ✅ Validate request
+          if (expectedRequestBody) {
+            for (const key in expectedRequestBody) {
+              if (parsedBody?.[key] !== expectedRequestBody[key]) {
+                clearTimeout(timeout);
+                return reject(
+                  new Error(
+                    `❌ Request mismatch for "${key}" – Expected: ${expectedRequestBody[key]}, Got: ${parsedBody?.[key]}`
+                  )
+                );
+              }
+            }
+          }
+
+          // ✅ Wait for matching response
+          const response = await page.waitForResponse(
+            (res) => res.url().includes(urlPattern),
+            { timeout: 10000 }
+          );
+
+          const json = await response.json();
+          console.log('📥 Response:', json);
+        await waitUntilpagenetworkidle(page);
+          if (expectedResponse) {
+            for (const key in expectedResponse) {
+              if (json[key] !== expectedResponse[key]) {
+                clearTimeout(timeout);
+                return reject(
+                  new Error(
+                    `❌ Response mismatch for "${key}" – Expected: ${expectedResponse[key]}, Got: ${json[key]}`
+                  )
+                );
+              }
+            }
+          }
+
+          clearTimeout(timeout);
+          resolve({ request: parsedBody, response: json });
+
+        } catch (err) {
+          clearTimeout(timeout);
+          reject(new Error(`❌ No matching response received for: ${urlPattern}`));
+        }
+      }
+    });
+  });
+}
+
+
+
+
 //************************Generic switchToTab()/Module Function************************
 export async function switchToTabOrModule(page, config) {
-  // await waitUntilpageload(page);
+  await waitUntilpagedomcontentloaded(page);
   let tabArray = [];
   // Accept either: [{name: 'tab'}] or {name: 'tab'}
   if (Array.isArray(config)) {
@@ -221,6 +298,7 @@ export async function switchToTabOrModule(page, config) {
     }
 
     const tabLocator = page.locator(`xpath=(//*[text()='${tabText}'])[1]`);
+      console.log(`Switching to tab/module: "${tabLocator}"`);
 
     if (await tabLocator.count() === 0) {
       console.warn(`Tab/module "${tabText}" not found`);
@@ -229,7 +307,10 @@ export async function switchToTabOrModule(page, config) {
 
     if (await tabLocator.isVisible()) {
       await highlightElement(page, tabLocator);
+      await waitUntilpagedomcontentloaded(page);
+      console.log(`Switching to tab/module: "${tabLocator}"`);
       await tabLocator.click();
+         await waitUntilpageload(page);
       console.log(`Switched to tab/module: "${tabText}"`);
     } else {
       console.warn(`Tab/module "${tabText}" is present but not visible.`);
