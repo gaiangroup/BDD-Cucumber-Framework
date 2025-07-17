@@ -26,6 +26,7 @@
   "dependencies": {
     "@playwright/test": "^1.53.2",
     "imap": "^0.8.19",
+    "lodash": "^4.17.21",
     "mailparser": "^3.7.4",
     "pixelmatch": "^7.1.0"
   }
