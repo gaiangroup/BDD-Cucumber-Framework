@@ -1,25 +1,22 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const archiver = require('archiver');
-const multipleReport = require('multiple-cucumber-html-reporter');
-const singleReport = require('cucumber-html-reporter');
 
-const defaultTag = '@editStorage';
+const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+const reportDir = path.join(__dirname, '../reports/json_reports');
+const reportJsonPath = path.join(reportDir, `json_report_${timestamp}.json`);
 
-const defaultFeatureDir = 'features';
-
-const defaultOptions = [
-  '--require', 'step_definitions/**/*.js',
-  '--format', `"json:${reportJsonPath.replace(/\\/g, '/')}"` ,
-  '--format', 'progress'
-];
+if (!fs.existsSync(reportDir)) {
+  fs.mkdirSync(reportDir, { recursive: true });
+}
 
 if (fs.existsSync(reportJsonPath)) {
-  console.log('🧹 Cleaning up previous cucumber_report.json...');
+  console.log('🧹 Cleaning up previous report...');
   fs.unlinkSync(reportJsonPath);
 }
 
+const defaultTag = '@expandCollapse';
+const defaultFeatureDir = 'features';
 const args = process.argv.slice(2);
 const tagArg = args[0] || defaultTag;
 const featureArg = args[1] || defaultFeatureDir;
@@ -31,7 +28,8 @@ const cucumberArgs = [
   featureArg,
   '--tags',
   tagArg,
-  ...defaultOptions
+  '--format',
+  `"json:${reportJsonPath}"`
 ];
 
 const npmCmdQuoted = `"C:\\Program Files\\nodejs\\npm.cmd"`;
@@ -39,7 +37,7 @@ const npmCmdQuoted = `"C:\\Program Files\\nodejs\\npm.cmd"`;
 console.log(`🚀 Running Cucumber:
   Features: ${featureArg}
   Tag: ${tagArg}
-  npm: ${npmCmdQuoted}
+  Report: ${reportJsonPath}
 `);
 
 try {
@@ -50,7 +48,6 @@ try {
 
   cucumber.on('error', (err) => {
     console.error('❌ Failed to start process:', err.message);
-    console.error(err);
   });
 
   cucumber.on('close', (code) => {

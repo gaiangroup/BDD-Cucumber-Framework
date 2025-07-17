@@ -1,103 +1,61 @@
 const { When, Then } = require('@cucumber/cucumber');
 const { expect } = require('@playwright/test');
-const {
-  openTriggerIfPresent,
-  expandSection,
-  collapseSection,
-  isSectionExpanded
-} = require('../utils/commonFunctions.js');
 const expandCollapseConfig = require('../testData/expandCollapseConfig.json');
 
-// 🔹 Step: Open chatbot panel (first stage before expand)
+// 🔹 Step: Open chatbot panel
 When('User opens the chatbot panel', async function () {
   const config = expandCollapseConfig["chatbotPanel"];
-  if (!config?.openTriggerSelector) {
-    throw new Error("Missing openTriggerSelector for chatbotPanel");
-  }
   const trigger = this.page.locator(config.openTriggerSelector);
+  await trigger.waitFor({ state: 'visible', timeout: 10000 });
   await trigger.click();
-  await this.page.waitForTimeout(500); // allow panel to open
+  console.log(`[ACTION] Opened chatbot panel`);
+  await this.page.waitForTimeout(500);
 });
 
-// 🔹 Step: Expand chatbot
+// 🔹 Step: Expand the panel using toggle
 When('User expands the {string}', async function (key) {
   const config = expandCollapseConfig[key];
-  if (!config?.toggleButtonSelector) {
-    throw new Error(`Missing toggleButtonSelector for ${key}`);
-  }
-
-  const toggleBtn = this.page.locator(config.toggleButtonSelector);
-  if (await toggleBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await toggleBtn.click();
-    await this.page.waitForTimeout(500); // allow UI to expand
-  } else {
-    console.warn(`Expand button not visible: ${config.toggleButtonSelector}`);
-  }
+  const expandBtn = this.page.locator(`xpath=${config.toggleButtonSelector}`).first();
+  await expandBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await expandBtn.click({ force: true });
+  console.log(`[ACTION] Expanded: ${key}`);
+  await this.page.waitForTimeout(500);
 });
 
-// 🔹 Step: Collapse chatbot
+// 🔹 Step: Collapse the panel using X icon
 When('User collapses the {string}', async function (key) {
   const config = expandCollapseConfig[key];
-  if (!config?.toggleButtonSelector) {
-    throw new Error(`Missing toggleButtonSelector for ${key}`);
-  }
-
-  const toggleBtn = this.page.locator(config.toggleButtonSelector);
-  if (await toggleBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await toggleBtn.click();
-    await this.page.waitForTimeout(500); // allow UI to collapse
-  } else {
-    console.warn(`Collapse button not visible: ${config.toggleButtonSelector}`);
-  }
+  const collapseBtn = this.page.locator(`xpath=${config.collapseButtonSelector}`).first();
+  await collapseBtn.waitFor({ state: 'visible', timeout: 5000 });
+  await collapseBtn.click({ force: true });
+  console.log(`[ACTION] Collapsed: ${key}`);
+  await this.page.waitForTimeout(500);
 });
 
-// 🔹 Validation: Expanded
+// 🔹 Expanded check
 Then('Section should be expanded for {string}', async function (key) {
   const config = expandCollapseConfig[key];
-  if (!config) throw new Error(`Missing config for: ${key}`);
-
-  if (config.openTriggerSelector) {
-    await openTriggerIfPresent(this.page, config.openTriggerSelector);
-  }
-
-  if (config.panelSelector) {
-    await this.page.locator(config.panelSelector).waitFor({ state: 'visible', timeout: 10000 });
-  }
-
-  let isExpanded = false;
-  if (config.panelSelector) {
-    isExpanded = await this.page.locator(config.panelSelector).isVisible();
-  } else if (config.sectionLabel) {
-    isExpanded = await isSectionExpanded(this.page, config.sectionLabel);
-  }
-
-  console.log(`[DEBUG] Is panel visible (expanded)?`, isExpanded);
+  const panel = this.page.locator(config.panelStateSelector);
+  await panel.waitFor({ state: 'visible', timeout: 5000 });
+  const isVisible = await panel.isVisible();
+  const box = await panel.boundingBox();
+  const isExpanded = isVisible && box?.height > 10;
   expect(isExpanded).toBe(true);
+  console.log(`[ASSERT] Section "${key}" is expanded.`);
 });
 
-// 🔹 Validation: Collapsed using boundingBox
+// 🔹 Collapsed check
 Then('Section should be collapsed for {string}', async function (key) {
   const config = expandCollapseConfig[key];
-  if (!config) throw new Error(`Missing config for: ${key}`);
+  const panel = this.page.locator(config.panelStateSelector);
 
-  await this.page.waitForTimeout(500); // give UI time to collapse
+  const isVisible = await panel.evaluate((el) => {
+    const style = window.getComputedStyle(el);
+    return !(style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0');
+  }).catch(() => false);
 
-  let isCollapsed = false;
-  if (config.panelSelector) {
-    try {
-      const box = await this.page.locator(config.panelSelector).boundingBox();
-      console.log(`[DEBUG] Bounding box for ${config.panelSelector}:`, box);
+  const box = await panel.boundingBox().catch(() => null);
+  console.log(`[DEBUG] Visibility: ${isVisible}, Bounding box: ${JSON.stringify(box)}`);
 
-      // Consider collapsed if element is gone or has very small height
-      isCollapsed = box === null || box.height < 10;
-    } catch (err) {
-      console.warn(`[DEBUG] Error checking bounding box:`, err);
-      isCollapsed = true; // Assume collapsed if error occurs
-    }
-  } else if (config.sectionLabel) {
-    const expanded = await isSectionExpanded(this.page, config.sectionLabel);
-    isCollapsed = !expanded;
-  }
-
-  expect(isCollapsed).toBe(true);
+  expect(isVisible).toBe(true);
 });

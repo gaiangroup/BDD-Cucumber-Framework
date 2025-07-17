@@ -1,4 +1,4 @@
-const { expect } = require('@playwright/test');
+import { expect } from '@playwright/test';
 
 // ************************Handle Custom Checkboxes************************
 async function handleGenericForm(page, formJson) {
@@ -26,11 +26,11 @@ async function handleGenericForm(page, formJson) {
     }
   }
 
-  //Fill form fields
+  // Fill form fields
   for (const [label, config] of Object.entries(fields)) {
     const { value } = config;
     try {
-      // Handle Date Picker
+      // Date Picker
       if (
         value && config.type === "dateselection" &&
         typeof value === 'object' &&
@@ -46,12 +46,11 @@ async function handleGenericForm(page, formJson) {
         await dateLocator.waitFor({ state: 'visible', timeout: 10000 });
         await dateLocator.click();
 
-        // Trigger blur by JS if Tab/click doesn't work
         const dateInputLocator = page.locator(`(//*[text()='${label}']//following::mobius-date-picker)[1]//input`);
         if (await dateInputLocator.count()) {
           const inputHandle = await dateInputLocator.first().elementHandle();
           if (inputHandle) {
-            await inputHandle.evaluate(el => el.blur()); // force blur
+            await inputHandle.evaluate(el => el.blur());
             console.log(`Programmatically triggered blur on date input for "${label}"`);
           }
         }
@@ -60,7 +59,7 @@ async function handleGenericForm(page, formJson) {
         continue;
       }
 
-      // Handle Checkbox Array
+      // Checkbox Array
       if (
         Array.isArray(value) &&
         value.every(v => typeof v === 'object' && 'text' in v && 'matchIndex' in v)
@@ -71,7 +70,6 @@ async function handleGenericForm(page, formJson) {
           const checkbox = page.locator(
             `xpath=(//*[contains(@*, 'checkbox')]//following::*[normalize-space(text())='${val}'])[${idx}]`
           );
-
           await checkbox.waitFor({ state: 'visible', timeout: 10000 });
           await checkbox.click();
           console.log(`Checked "${val}" under "${label}"`);
@@ -79,7 +77,7 @@ async function handleGenericForm(page, formJson) {
         continue;
       }
 
-      // Handle Tag Input
+      // Tag Input
       if (
         Array.isArray(value) && config.type === "tag" &&
         value.every(v => typeof v === 'string')
@@ -95,12 +93,8 @@ async function handleGenericForm(page, formJson) {
         continue;
       }
 
-      // Handle Dropdown
-      if (
-        Array.isArray(value) &&
-        config.type === "dropdown"
-      ) {
-        // Try more robust locator:
+      // Dropdown
+      if (Array.isArray(value) && config.type === "dropdown") {
         const dropdownTrigger = page.locator(`xpath=(//*[normalize-space(text())='${label}']//following::mobius-dropdown-input-container/*)[1]`);
 
         if (await dropdownTrigger.count() === 0) {
@@ -108,23 +102,16 @@ async function handleGenericForm(page, formJson) {
           continue;
         }
 
-        // Ensure dropdown is open before the loop starts
         await dropdownTrigger.waitFor({ state: 'visible', timeout: 15000 });
         await dropdownTrigger.click();
         console.log(`Opened dropdown for "${label}".`);
 
         for (const val of value) {
-          // Wait for options to be present
           await page.waitForTimeout(200);
-
           const optionLocator = page.locator(`xpath=(//mobius-list-item[normalize-space(text())='${val}'])[1]`);
-          console.log(`Looking for option "${val}" in dropdown "${label}"...`);
-
-          // Click the option
           await optionLocator.click({ force: true });
           console.log(`Selected option "${val}" for "${label}".`);
 
-          // Re-open the dropdown if there are more options to select
           if (value.indexOf(val) < value.length - 1) {
             await dropdownTrigger.click();
             console.log(`Re-opened dropdown for next selection.`);
@@ -133,20 +120,17 @@ async function handleGenericForm(page, formJson) {
           await page.waitForTimeout(300);
         }
 
-        // Optional: Close the dropdown by clicking the label
         const labelClickLocator = page.locator(`xpath=(//*[normalize-space(text())='${label}'])[1]`);
         await labelClickLocator.click({ force: true });
         console.log(`Closed dropdown by clicking label "${label}".`);
-
-        console.log(`Completed dropdown selection for "${label}".`);
         continue;
       }
 
-      // Handle Input Field
+      // Input Field
       const inputLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
       await inputLocator.waitFor({ state: 'visible', timeout: 30000 });
       await inputLocator.click();
-      await waitUntilpagedomcontentloaded(page);
+      await waitUntilPageIsReady(page);
       await page.keyboard.type(value.toString());
 
       let maskedValue = value;
@@ -164,13 +148,12 @@ async function handleGenericForm(page, formJson) {
   }
 
   // 🔹 Submit form
-
   const actionButton = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
   console.log(buttonText);
   await actionButton.waitFor({ state: 'visible', timeout: 10000 });
   await expect(actionButton).toBeEnabled();
   await actionButton.click();
-  await waitUntilpageload(page); // Ensure network is idle after click
+  await waitUntilPageIsReady(page); // ✅ Corrected line
   console.log(`Clicked action button: "${buttonText}"`);
 
   // 🔹 Toast validation
@@ -180,6 +163,7 @@ async function handleGenericForm(page, formJson) {
     console.log(`Toast message shown: "${expectedToast}"`);
   }
 }
+
 
 //************************Generic switchToTab()/Module Function************************
 async function switchToTabOrModule(page, config) {
@@ -544,28 +528,45 @@ async function verifyTooltip(page, config) {
 async function openTriggerIfPresent(page, selector) {
   if (!selector) return;
   const element = page.locator(selector);
-  if (await element.isVisible()) {
+  const count = await element.count();
+  if (count > 0 && await element.isVisible()) {
     console.log(`🔘 Clicking: ${selector}`);
-    await element.click();
+    await element.click({ force: true });  // Use force to click even if covered by other elements
+  } else {
+    console.log(`Element not visible or does not exist: ${selector}`);
   }
 }
 
 async function expandSection(page, label) {
   const toggle = page.locator(`text=${label} >> xpath=../..//button[contains(@aria-label, "Expand")]`);
-  if (await toggle.isVisible()) await toggle.click();
+  await toggle.waitFor({ state: 'visible', timeout: 10000 });  // Wait for the element to become visible
+  await toggle.scrollIntoViewIfNeeded();  // Ensure it's in view
+  if (await toggle.isEnabled()) {
+    console.log(`🔘 Expanding section: ${label}`);
+    await toggle.click({ force: true });  // Use force click to bypass overlays
+  } else {
+    console.log(`Element not enabled for expanding: ${label}`);
+  }
 }
 
 async function collapseSection(page, label) {
   const toggle = page.locator(`text=${label} >> xpath=../..//button[contains(@aria-label, "Collapse")]`);
-  if (await toggle.isVisible()) await toggle.click();
+  await toggle.waitFor({ state: 'visible', timeout: 10000 });  // Wait for the element to become visible
+  await toggle.scrollIntoViewIfNeeded();  // Ensure it's in view
+  if (await toggle.isEnabled()) {
+    console.log(`🔘 Collapsing section: ${label}`);
+    await toggle.click({ force: true });  // Use force click to bypass overlays
+  } else {
+    console.log(`Element not enabled for collapsing: ${label}`);
+  }
 }
 
 async function isSectionExpanded(page, label) {
   const section = page.locator(`text=${label} >> xpath=../..`);
+  await section.waitFor({ state: 'visible', timeout: 10000 });  // Wait for section to become visible
   const expanded = await section.getAttribute('aria-expanded');
   return expanded === 'true';
 }
-
 
 // ******************** Navigate to Infra Page ********************/
 async function goToInfraSection(page, sectionName, infraName) {
@@ -672,9 +673,26 @@ async function editStorageForm(page, formJson) {
   await toastLocator.waitFor({ state: 'visible', timeout: 5000 });
   console.log(`✅ Toast appeared: "${expectedToast}"`);
 }
+//************************Assertions for expected text labels or placeholders************************
+async function handleAssertions(page, expectedArray) {
+  for (const item of expectedArray) {
+    const expectedText = typeof item === 'string'
+      ? item
+      : item?.expectedName || item?.text || JSON.stringify(item);
 
+    const locator = page.locator(`text=${expectedText}`);
+    try {
+      await locator.waitFor({ state: 'visible', timeout: 10000 });
+      console.log(`✅ Verified text on screen: "${expectedText}"`);
+    } catch (err) {
+      console.error(`❌ Could not find expected text: "${expectedText}"`);
+      throw err;
+    }
+  }
+}
 
-module.exports = {
+export {
+  handleAssertions,
   handleGenericForm,
   switchToTabOrModule,
   clickButton,
@@ -690,5 +708,4 @@ module.exports = {
   openStorageModelOptions,
   editStorageForm
 };
-
 

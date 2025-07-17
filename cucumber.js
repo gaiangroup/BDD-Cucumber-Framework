@@ -1,3 +1,10 @@
 module.exports = {
-  default: '--require step_definitions/**/*.js'
+  default: {
+    require: [
+      'utils/commonFunctions.js',
+      'step_definitions/**/*.js'
+    ],
+    requireModule: [],
+    format: ['summary']
+  }
 };

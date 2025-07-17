@@ -1,10 +1,13 @@
-const { BeforeAll,AfterAll,Given, When, Then, Before, After } = require('@cucumber/cucumber');
-const { chromium } = require('playwright');
-const { expect } = require('chai');
-const { handleGenericForm, waitUntilPageIsReady, handleAssertions } = require('../utils/commonFunctions');
-const login_testData = require('../testData/login.json');
-//const { BeforeAll } = require('cucumber-js');
-//const { AfterAll } = require('cucumber-js');
+import { BeforeAll, AfterAll, Given, When, Then, Before, After } from '@cucumber/cucumber';
+import { chromium } from 'playwright';
+import { expect } from 'chai';
+import {
+  handleGenericForm,
+  waitUntilPageIsReady,
+  handleAssertions
+} from '../utils/commonFunctions.js'; // ⬅️ Include .js extension in ES modules
+
+import login_testData from '../testData/login.json' with { type: 'json' }; // ✅ ES module JSON import
 
 let browser;
 
@@ -30,31 +33,31 @@ AfterAll(async function () {
 });
 
 Given('User navigate to the login page', { timeout: 20000 }, async function () {
-    await this.page.goto(login_testData.baseUrl);
+  await this.page.goto(login_testData.baseUrl);
 });
 
 When('User verifies all input field labels are correct', { timeout: 20000 }, async function () {
-    await handleAssertions(this.page, login_testData.texts);
+  await handleAssertions(this.page, login_testData.texts);
 });
 
 When('User verifies placeholder text for each field is correct', { timeout: 20000 }, async function () {
-    await handleAssertions(this.page, login_testData.placeholders);
+  await handleAssertions(this.page, login_testData.placeholders);
 });
 
 When('User login with valid credentials and successful login', { timeout: 50000 }, async function () {
-    await handleGenericForm(this.page, login_testData.login_form);
-    await waitUntilPageIsReady(this.page);
+  await handleGenericForm(this.page, login_testData.login_form);
+  await waitUntilPageIsReady(this.page);
 });
 
 Then('User attempts login with an invalid email and invalid password,and verifies the error', { timeout: 20000 }, async function () {
-    await handleGenericForm(this.page, login_testData.negativeTestData_1);
+  await handleGenericForm(this.page, login_testData.negativeTestData_1);
 });
 
 Then('User attempts login with a valid email and an invalid password,and verifies the error', { timeout: 20000 }, async function () {
-    await this.page.reload();
-    await handleGenericForm(this.page, login_testData.negativeTestData_2);
+  await this.page.reload();
+  await handleGenericForm(this.page, login_testData.negativeTestData_2);
 });
 
 Then('User should see the Dashboard as home page', async function () {
-    await handleAssertions(this.page, login_testData.screenshots);
+  await handleAssertions(this.page, login_testData.screenshots);
 });

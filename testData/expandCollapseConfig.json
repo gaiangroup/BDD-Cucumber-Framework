@@ -1,8 +1,8 @@
 {
   "chatbotPanel": {
     "openTriggerSelector": "mobius-div[id*='input'][id$='box']",
-    "panelSelector": "mobius-conditional-renderer[id*='bg'][id*='one'] img[class*='rounded']",
-    "collapseButtonSelector": "mobius-conditional-renderer[id*='bg'][id*='two'] img[class*='rounded']",
-    "toggleButtonSelector": "mobius-conditional-renderer[id*='bg'][id*='two'] img[class*='rounded']"
+    "toggleButtonSelector": "//img[@class='w-4 h-4 rounded-full'][1]",
+    "collapseButtonSelector": "//img[@class='w-3 h-3 rounded-full']",
+    "panelStateSelector": "//mobius-div[@id='gpt-interaction-container']"
   }
 }
