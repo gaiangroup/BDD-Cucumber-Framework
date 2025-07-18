@@ -1,9 +1,10 @@
 const { When, Then, Before, After, Status } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
-const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple,waitUntilPageIsReady, waitUntilpagedomcontentloaded,waitUntilpagenetworkidle,waitUntilpageload, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow,applyFiltersAndValidateResults } = require('../utils/commonFunctions');
+const { handleGenericForm, switchToTabOrModule, scrollContainerById, clickButton, threeDotActionMenu, handlePopupSimple, waitUntilPageIsReady, waitUntilpagedomcontentloaded, waitUntilpagenetworkidle, waitUntilpageload, performKeyboardActions, sendAndValidateInvites, validateTableHeadersAndRow, applyFiltersAndValidateResults, allowLocationAccess } = require('../utils/commonFunctions');
 const myOrg_json = require('../testData/myOrg.json');
 const tableData = require('../testData/tableData.json');
 const config = require('../testData/filter.json');
+const login_testData = require('../testData/login.json');
 
 const fs = require('fs');
 const path = require('path');
@@ -29,6 +30,8 @@ After(async function (scenario) {
 When('User switches to My Organization tab', { timeout: 20000 }, async function () {
     await waitUntilpagedomcontentloaded(this.page);
     await switchToTabOrModule(this.page, myOrg_json.tabs[0]);
+    const context = this.page.context();
+    await allowLocationAccess(context, login_testData.baseUrl);
 });
 
 When('User clicks on Role tab', { timeout: 20000 }, async function () {
@@ -115,15 +118,15 @@ Then(
         if (tabIndex === -1) {
             throw new Error(`Tab "${tabName}" not found in myOrg_json.tabs`);
         }
-     await waitUntilpageload(this.page);
-     await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
+        await waitUntilpageload(this.page);
+        await switchToTabOrModule(this.page, myOrg_json.tabs[tabIndex]);
         // ✅ Use tableData, which is correctly imported above
         const tableInfo = tableData[tabName];
 
         if (!tableInfo) {
             throw new Error(`No test data found for table: "${tabName}"`);
         }
-         await waitUntilpagenetworkidle(this.page);
+        await waitUntilpagenetworkidle(this.page);
         await validateTableHeadersAndRow(this.page, tableInfo.expectedHeaders, tableInfo.expectedRow);
         await waitUntilpageload(this.page);
     }
@@ -161,11 +164,11 @@ Then('User should see able to delete the Team successfully', { timeout: 20000 },
 });
 
 Then(
-  'User apply filters for {string} and verify results of Roles & Privileges',
-  { timeout: 60 * 1000 },                // ← give this step up to 60 s
-  async function (tableKey) {
-    const cfg = config[tableKey];
-    if (!cfg) throw new Error(`No filter config for "${tableKey}"`);
-    await applyFiltersAndValidateResults(this.page, cfg);
-  }
+    'User apply filters for {string} and verify results of Roles & Privileges',
+    { timeout: 60 * 1000 },                // ← give this step up to 60 s
+    async function (tableKey) {
+        const cfg = config[tableKey];
+        if (!cfg) throw new Error(`No filter config for "${tableKey}"`);
+        await applyFiltersAndValidateResults(this.page, cfg);
+    }
 );
