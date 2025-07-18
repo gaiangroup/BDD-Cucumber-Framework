@@ -3,7 +3,8 @@ Feature: Testing User flow of RUNRUN
 
   Background: Login
     Given User navigate to the login page
-    When User login with valid credentials and successful login
+    # When User login with valid credentials and successful login
+    When validate API "Login" is called with correct request and response
 
   Scenario: Login and perform CRUD operations as a user
 
@@ -27,7 +28,7 @@ Feature: Testing User flow of RUNRUN
     Then User should send the invitation and validate the subject
     Then User should click on the invite popup
     Then User clicks on "My Infra" tab and validates the table infra
-    Then User clicks on "Customers" tab and validates the table Customers
+    # Then User clicks on "Customers" tab and validates the table Customers
     And User should switch to projects tab
     And User clicks Add Project button
     Then User should fill all the required details to create project

@@ -1,7 +1,8 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 import { expect } from '@playwright/test';
-
-// ************************Handle Custom Checkboxes************************
-async function handleGenericForm(page, formJson) {
+export async function handleGenericForm(page, formJson) {
+  await waitUntilpageload(page);
   const fields = formJson.fields || {};
   const buttonText = formJson.buttonText;
   const expectedToast = formJson.expectedToast || null;
@@ -13,7 +14,9 @@ async function handleGenericForm(page, formJson) {
     const submitBtn = page.locator(`xpath=(//*[contains(text(),'${buttonText}')])[${matchIndex}]`);
     if (await submitBtn.isVisible()) {
       await expect(submitBtn).toBeEnabled();
+      await highlightElement(page, submitBtn);
       await submitBtn.click();
+      waitUntilpagenetworkidle(page); // Ensure network is idle after click
       console.log(`Clicked action button (pre-submit): "${buttonText}"`);
 
       const errorLocator = page.locator(`text=${requiredError}`);
@@ -26,11 +29,11 @@ async function handleGenericForm(page, formJson) {
     }
   }
 
-  // Fill form fields
+  //Fill form fields
   for (const [label, config] of Object.entries(fields)) {
     const { value } = config;
     try {
-      // Date Picker
+      // Handle Date Picker
       if (
         value && config.type === "dateselection" &&
         typeof value === 'object' &&
@@ -40,17 +43,20 @@ async function handleGenericForm(page, formJson) {
       ) {
         const datePickerTrigger = page.locator(`(//*[text()='${label}']//following::mobius-date-picker)[1]`);
         await datePickerTrigger.waitFor({ state: 'visible', timeout: 10000 });
+        await highlightElement(page, datePickerTrigger);
         await datePickerTrigger.click({ force: true });
 
         const dateLocator = page.locator(`(//div[contains(text(),'${value.day}')])[${value.index}]`);
         await dateLocator.waitFor({ state: 'visible', timeout: 10000 });
+        await highlightElement(page, dateLocator);
         await dateLocator.click();
 
+        // Trigger blur by JS if Tab/click doesn't work
         const dateInputLocator = page.locator(`(//*[text()='${label}']//following::mobius-date-picker)[1]//input`);
         if (await dateInputLocator.count()) {
           const inputHandle = await dateInputLocator.first().elementHandle();
           if (inputHandle) {
-            await inputHandle.evaluate(el => el.blur());
+            await inputHandle.evaluate(el => el.blur()); // force blur
             console.log(`Programmatically triggered blur on date input for "${label}"`);
           }
         }
@@ -59,7 +65,7 @@ async function handleGenericForm(page, formJson) {
         continue;
       }
 
-      // Checkbox Array
+      // Handle Checkbox Array
       if (
         Array.isArray(value) &&
         value.every(v => typeof v === 'object' && 'text' in v && 'matchIndex' in v)
@@ -70,14 +76,17 @@ async function handleGenericForm(page, formJson) {
           const checkbox = page.locator(
             `xpath=(//*[contains(@*, 'checkbox')]//following::*[normalize-space(text())='${val}'])[${idx}]`
           );
+
           await checkbox.waitFor({ state: 'visible', timeout: 10000 });
+          await highlightElement(page, checkbox);
+
           await checkbox.click();
           console.log(`Checked "${val}" under "${label}"`);
         }
         continue;
       }
 
-      // Tag Input
+      // Handle Tag Input
       if (
         Array.isArray(value) && config.type === "tag" &&
         value.every(v => typeof v === 'string')
@@ -85,6 +94,8 @@ async function handleGenericForm(page, formJson) {
         const tagInput = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[3])[1]`);
         await tagInput.waitFor({ state: 'visible', timeout: 10000 });
         for (const val of value) {
+          await highlightElement(page, tagInput);
+
           await tagInput.click();
           await page.keyboard.type(val);
           await page.keyboard.press('Enter');
@@ -93,8 +104,12 @@ async function handleGenericForm(page, formJson) {
         continue;
       }
 
-      // Dropdown
-      if (Array.isArray(value) && config.type === "dropdown") {
+      // Handle Dropdown
+      if (
+        Array.isArray(value) &&
+        config.type === "dropdown"
+      ) {
+        // Try more robust locator:
         const dropdownTrigger = page.locator(`xpath=(//*[normalize-space(text())='${label}']//following::mobius-dropdown-input-container/*)[1]`);
 
         if (await dropdownTrigger.count() === 0) {
@@ -102,17 +117,28 @@ async function handleGenericForm(page, formJson) {
           continue;
         }
 
+        // Ensure dropdown is open before the loop starts
         await dropdownTrigger.waitFor({ state: 'visible', timeout: 15000 });
+        await highlightElement(page, dropdownTrigger);
+
         await dropdownTrigger.click();
         console.log(`Opened dropdown for "${label}".`);
 
         for (const val of value) {
+          // Wait for options to be present
           await page.waitForTimeout(200);
+
           const optionLocator = page.locator(`xpath=(//mobius-list-item[normalize-space(text())='${val}'])[1]`);
+          console.log(`Looking for option "${val}" in dropdown "${label}"...`);
+          await highlightElement(page, optionLocator);
+
+          // Click the option
           await optionLocator.click({ force: true });
           console.log(`Selected option "${val}" for "${label}".`);
 
+          // Re-open the dropdown if there are more options to select
           if (value.indexOf(val) < value.length - 1) {
+            await highlightElement(page, dropdownTrigger);
             await dropdownTrigger.click();
             console.log(`Re-opened dropdown for next selection.`);
           }
@@ -120,17 +146,25 @@ async function handleGenericForm(page, formJson) {
           await page.waitForTimeout(300);
         }
 
+        // Optional: Close the dropdown by clicking the label
         const labelClickLocator = page.locator(`xpath=(//*[normalize-space(text())='${label}'])[1]`);
+        await highlightElement(page, labelClickLocator);
+
         await labelClickLocator.click({ force: true });
         console.log(`Closed dropdown by clicking label "${label}".`);
+
+        console.log(`Completed dropdown selection for "${label}".`);
         continue;
       }
 
-      // Input Field
+      // Handle Input Field
       const inputLocator = page.locator(`xpath=(//*[contains(text(),'${label}')]//following::mobius-div[2])[1]`);
       await inputLocator.waitFor({ state: 'visible', timeout: 30000 });
+      await highlightElement(page, inputLocator);
+
       await inputLocator.click();
-      await waitUntilPageIsReady(page);
+
+      await waitUntilpagedomcontentloaded(page);
       await page.keyboard.type(value.toString());
 
       let maskedValue = value;
@@ -152,8 +186,9 @@ async function handleGenericForm(page, formJson) {
   console.log(buttonText);
   await actionButton.waitFor({ state: 'visible', timeout: 10000 });
   await expect(actionButton).toBeEnabled();
+  await highlightElement(page, actionButton);
+
   await actionButton.click();
-  await waitUntilPageIsReady(page); // ✅ Corrected line
   console.log(`Clicked action button: "${buttonText}"`);
 
   // 🔹 Toast validation
@@ -165,14 +200,180 @@ async function handleGenericForm(page, formJson) {
 }
 
 
+
+
+export async function interceptAndValidateApi(page, config) {
+  const {
+    urlPattern,
+    method,
+    expectedRequestBody, // Optional
+    expectedResponse,   // Optional
+    validateRequestBody = true, // Default true if not specified
+    validateResponse = true     // Default true if not specified
+  } = config;
+
+  if (!urlPattern) {
+    throw new Error('❌ urlPattern is required for API validation');
+  }
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`❌ Timed out waiting for API call: ${urlPattern}`));
+    }, 20000);
+
+    const requestHandler = async (request) => {
+      if (
+        request.url().includes(urlPattern) &&
+        (!method || request.method().toLowerCase() === method.toLowerCase())
+      ) {
+        try {
+          page.off('request', requestHandler);
+
+          const postData = request.postData();
+          const parsedBody = postData ? JSON.parse(postData) : null;
+
+          console.log('📤 Request:', request.url(), parsedBody);
+
+          // Validate request body if configured to do so
+          if (validateRequestBody && expectedRequestBody) {
+            for (const key in expectedRequestBody) {
+              if (typeof expectedRequestBody[key] === 'object') {
+                const expectedStr = JSON.stringify(expectedRequestBody[key]);
+                const actualStr = JSON.stringify(parsedBody?.[key]);
+                if (expectedStr !== actualStr) {
+                  console.log('Detailed Request Body Comparison:');
+                  console.log('Expected:', expectedRequestBody[key]);
+                  console.log('Actual:', parsedBody?.[key]);
+                  clearTimeout(timeout);
+                  return reject(
+                    new Error(
+                      `❌ Request body mismatch for "${key}" - Expected: ${expectedStr}, Got: ${actualStr}`
+                    )
+                  );
+                }
+              } else if (parsedBody?.[key] !== expectedRequestBody[key]) {
+                clearTimeout(timeout);
+                return reject(
+                  new Error(
+                    `❌ Request body mismatch for "${key}" - Expected: ${expectedRequestBody[key]}, Got: ${parsedBody?.[key]}`
+                  )
+                );
+              }
+            }
+          }
+
+          // Wait for response
+          const response = await page.waitForResponse(
+            (res) => res.url().includes(urlPattern),
+            { timeout: 10000 }
+          );
+
+          const json = await response.json();
+          console.log('📥 Response:', json);
+
+          // Validate response body if configured to do so
+          if (validateResponse && expectedResponse) {
+            // Function to recursively check for matching keys and values in response
+            const validateObject = (actual, expected, path = '') => {
+              for (const key in expected) {
+                const currentPath = path ? `${path}.${key}` : key;
+
+                // Check if it's an object (not an array or primitive value)
+                if (typeof expected[key] === 'object' && expected[key] !== null) {
+                  validateObject(actual?.[key], expected[key], currentPath);
+                } else {
+                  // Match the field value
+                  if (actual?.[key] !== expected[key]) {
+                    console.log('Detailed Response Comparison:');
+                    console.log('Expected:', expected[key]);
+                    console.log('Actual:', actual?.[key]);
+                    clearTimeout(timeout);
+                    return reject(
+                      new Error(
+                        `❌ Response mismatch for "${currentPath}" - Expected: ${expected[key]}, Got: ${actual?.[key]}`
+                      )
+                    );
+                  }
+                }
+              }
+            };
+
+            // Start validating
+            validateObject(json, expectedResponse);
+          }
+
+          clearTimeout(timeout);
+          resolve({
+            request: parsedBody,
+            response: json,
+            statusCode: response.status()
+          });
+
+        } catch (err) {
+          clearTimeout(timeout);
+          reject(new Error(`❌ Error processing API call: ${err.message}`));
+        }
+      }
+    };
+
+    page.on('request', requestHandler);
+  });
+}
+
+
 //************************Generic switchToTab()/Module Function************************
-async function switchToTabOrModule(page, config) {
+// export async function switchToTabOrModule(page, config) {
+//   await waitUntilpagedomcontentloaded(page);
+//   let tabArray = [];
+//   // Accept either: [{name: 'tab'}] or {name: 'tab'}
+//   if (Array.isArray(config)) {
+//     tabArray = config.map(t => t.name);
+//   } else if (config?.name) {
+//     tabArray = [config.name]; // single tab
+//   } else if (config?.tabs) {
+//     tabArray = config.tabs.map(t => t.name);
+//   } else {
+//     console.warn('"tabName" or "tabs" not found or invalid in JSON');
+//     return;
+//   }
+
+//   for (const tabText of tabArray) {
+//     if (!tabText || typeof tabText !== 'string') {
+//       console.warn(`Invalid tab name: ${tabText}`);
+//       continue;
+//     }
+
+//     const tabLocator = page.locator(`xpath=(//*[text()='${tabText}'])[1]`);
+//       console.log(`Switching to tab/module: "${tabLocator}"`);
+
+//     if (await tabLocator.count() === 0) {
+//       console.warn(`Tab/module "${tabText}" not found`);
+//       continue;
+//     }
+
+//     if (await tabLocator.isVisible()) {
+//       await highlightElement(page, tabLocator);
+//       await waitUntilpagenetworkidle(page);
+
+//       console.log(`Switching to tab/module: "${tabLocator}"`);
+//       await tabLocator.click();
+//          await waitUntilpageload(page);
+//       console.log(`Switched to tab/module: "${tabText}"`);
+//     } else {
+//       console.warn(`Tab/module "${tabText}" is present but not visible.`);
+//     }
+//   }
+// }
+
+export async function switchToTabOrModule(page, config) {
+  await waitUntilpagedomcontentloaded(page);
   let tabArray = [];
-  // Accept either: [{name: 'tab'}] or {name: 'tab'}
+
+  // Handle different config formats
   if (Array.isArray(config)) {
     tabArray = config.map(t => t.name);
   } else if (config?.name) {
-    tabArray = [config.name]; // single tab
+    tabArray = [config.name];
   } else if (config?.tabs) {
     tabArray = config.tabs.map(t => t.name);
   } else {
@@ -186,22 +387,29 @@ async function switchToTabOrModule(page, config) {
       continue;
     }
 
-    const tabLocator = page.locator(`xpath=(//*[text()='${tabText}'])[1]`);
+    try {
+      // More flexible locator that handles different cases
+      const tabLocator = page.locator(`xpath=//*[contains(text(), '${tabText}')]`).first();
 
-    if (await tabLocator.count() === 0) {
-      console.warn(`Tab/module "${tabText}" not found`);
-      continue;
-    }
+      console.log(`Attempting to switch to tab/module: "${tabText}"`);
 
-    if (await tabLocator.isVisible()) {
+      // Wait for the tab to be present and visible
+      await tabLocator.waitFor({ state: 'visible', timeout: 10000 });
+
+      await highlightElement(page, tabLocator);
+      await waitUntilpagenetworkidle(page);
+
+      console.log(`Clicking tab/module: "${tabText}"`);
       await tabLocator.click();
-      console.log(`Switched to tab/module: "${tabText}"`);
-    } else {
-      console.warn(`Tab/module "${tabText}" is present but not visible.`);
+      await waitUntilpageload(page);
+
+      console.log(`Successfully switched to tab/module: "${tabText}"`);
+    } catch (error) {
+      console.error(`Failed to switch to tab/module "${tabText}":`, error.message);
+      throw error; // Re-throw to fail the test
     }
   }
 }
-
 
 /**
  * Validates headers and checks that at least one row is present in the table.
@@ -241,7 +449,7 @@ export async function validateTableHeadersAndRow(page, expectedHeaders) {
 
 
 //************************Click Button Function************************
-async function clickButton(page, buttonConfig) {
+export async function clickButton(page, buttonConfig) {
   const label = buttonConfig?.label;
 
   if (!label || typeof label !== 'string') {
@@ -263,7 +471,10 @@ async function clickButton(page, buttonConfig) {
   try {
     await button.waitFor({ state: 'visible', timeout: 7000 });
     await expect(button).toBeEnabled({ timeout: 5000 });
+    await highlightElement(page, button);
+
     await button.click();
+
     console.log(`Clicked on button: "${label}"`);
   } catch (error) {
     console.error(`Failed to click button "${label}":`, error.message);
@@ -271,15 +482,53 @@ async function clickButton(page, buttonConfig) {
   }
 }
 
+/**
+ * Highlights an element on the page by applying a flashing outline.
+ * @param {import('@playwright/test').Page} page - The Playwright page instance.
+ * @param {string} selector - The selector of the element to highlight.
+ */
+export async function highlightElement(page, locator) {
+  const elementHandle = await locator.elementHandle();
+  if (!elementHandle) {
+    console.warn('Element handle not found for highlight.');
+    return;
+  }
+
+  await page.evaluate(el => {
+    const originalOutline = el.style.outline;
+    el.style.transition = 'outline 0.2s ease-in-out';
+    el.style.outline = '2px solid pink';
+    setTimeout(() => {
+      el.style.outline = originalOutline;
+    }, 1000);
+  }, elementHandle);
+}
+
+
 //*************************Wait Until Page is Ready************************
-async function waitUntilPageIsReady(page) {
-  await page.waitForLoadState('load');        // Waits for the full load event
-  await page.waitForLoadState('domcontentloaded'); // Waits until the DOM is parsed
-  await page.waitForLoadState('networkidle');
+
+
+export async function waitUntilPageIsReady(page) {
+  await page.waitForLoadState('networkidle', { timeout: 50000 });
+  await page.waitForLoadState('load', { timeout: 50000 });       // Waits for the full load event
+  await page.waitForLoadState('domcontentloaded', { timeout: 50000 }); // Waits until the DOM is parsed
+
+}
+export async function waitUntilpageload(page) {
+  await page.waitForLoadState('load', { timeout: 50000 });       // Waits for the full load event
+
+}
+export async function waitUntilpagenetworkidle(page) {
+  await page.waitForLoadState('networkidle', { timeout: 50000 });
+
+}
+export async function waitUntilpagedomcontentloaded(page) {
+  await page.waitForLoadState('domcontentloaded', { timeout: 50000 }); // Waits until the DOM is parsed
+
 }
 
 //*************************Navigate and Enter using Keyboard************************
-async function performKeyboardActions(page, actions = []) {
+export async function performKeyboardActions(page, actions = []) {
   if (!Array.isArray(actions) || actions.length === 0) {
     console.warn('"keyboardAction" config is missing or invalid.');
     return;
@@ -301,16 +550,17 @@ async function performKeyboardActions(page, actions = []) {
     }
 
     if (finalKey) {
+      await waitUntilpagenetworkidle(page);
       await page.keyboard.press(finalKey);
       console.log(`Pressed final key: ${finalKey}`);
     }
   }
 }
 
-//********************Generic invitation sender and email validator.*****************/
-// utils/sendAndValidateInvites.js
-async function sendAndValidateInvites(page, config) {
-  // Dynamically import ESM-compatible packages
+
+
+//*************************Email Invite subject validation************************
+export async function sendAndValidateInvites(page, config) {
   const dotenv = await import('dotenv');
   dotenv.config();
 
@@ -334,6 +584,8 @@ async function sendAndValidateInvites(page, config) {
   // Step 2: Click Send Invites button
   const sendBtn = page.locator(`xpath=(//*[text() = "${sendButton}"])[1]`);
   await sendBtn.waitFor({ state: "visible", timeout: 10000 });
+  await highlightElement(page, sendBtn);
+
   await sendBtn.click();
   console.log("Clicked send button");
   console.log("✅ Clicked send button");
@@ -420,9 +672,10 @@ async function sendAndValidateInvites(page, config) {
 
       const { chromium } = await import('playwright');
       const browser = await chromium.launch();
-      const context = await browser.newContext({  viewport: { width: 2000, height: 2000 }
-});
-      
+      const context = await browser.newContext({
+        viewport: { width: 2000, height: 2000 }
+      });
+
       const dummyPage = await context.newPage();
 
       try {
@@ -434,6 +687,8 @@ async function sendAndValidateInvites(page, config) {
 
         if (inboxVisible) {
           console.log("Inbox found. Clicking latest email...");
+          await highlightElement(page, inboxRowSelector);
+
           await dummyPage.locator(`xpath=${inboxRowSelector}`).click();
           await dummyPage.waitForTimeout(2000);
 
@@ -690,22 +945,4 @@ async function handleAssertions(page, expectedArray) {
     }
   }
 }
-
-export {
-  handleAssertions,
-  handleGenericForm,
-  switchToTabOrModule,
-  clickButton,
-  waitUntilPageIsReady,
-  performKeyboardActions,
-  sendAndValidateInvites,
-  verifyTooltip,
-  openTriggerIfPresent,
-  expandSection,
-  collapseSection,
-  isSectionExpanded,
-  goToInfraSection,
-  openStorageModelOptions,
-  editStorageForm
-};
-
+   

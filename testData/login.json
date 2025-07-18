@@ -1,5 +1,5 @@
 {
-    "baseUrl": "https://runrun-ui.gov-cloud.ai/login",
+    "baseUrl": "https://runrun-ui.gov-cloud.ai",
     "login_form": {
         "buttonText": "Login",
         "matchIndex": 1,
@@ -41,8 +41,11 @@
         }
     },
     "screenshots": [
-  "Dashboard"
-],
+        {
+            "expectedName": "Dashboard_Screenshot",
+            "folder": "screenshots"
+        }
+    ],
     "texts": [
         {
             "descriptionOfField": "Asserting visibility of Email field label",
