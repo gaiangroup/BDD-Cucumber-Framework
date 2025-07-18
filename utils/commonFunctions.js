@@ -321,6 +321,17 @@ export async function interceptAndValidateApi(page, config) {
 }
 
 
+export async function allowLocationAccess(context, origin) {
+  try {
+    await context.setGeolocation({ latitude: 12.9716, longitude: 77.5946 });
+    await context.grantPermissions(['geolocation'], { origin });
+    console.log(`✅ Location access granted for: ${origin}`);
+  } catch (error) {
+    console.error(`❌ Failed to grant location access: ${error.message}`);
+  }
+}
+
+
 //************************Generic switchToTab()/Module Function************************
 // export async function switchToTabOrModule(page, config) {
 //   await waitUntilpagedomcontentloaded(page);
